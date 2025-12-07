@@ -1,0 +1,70 @@
+{
+  "buses": [
+    {
+      "id": "1",
+      "plateNumber": "DK-001-AA",
+      "line": "Ligne 5",
+      "driver": "Moussa Diop",
+      "status": "En service",
+      "seats": 45,
+      "sections": [
+        {
+          "sectionNumber": 1,
+          "price": 150
+        },
+        {
+          "sectionNumber": 2,
+          "price": 200
+        },
+        {
+          "sectionNumber": 3,
+          "price": 300
+        }
+      ]
+    },
+    {
+      "id": "2",
+      "plateNumber": "DK-204-BB",
+      "line": "Ligne 12",
+      "driver": "Alioune Fall",
+      "status": "En service",
+      "seats": 50,
+      "sections": [
+        {
+          "sectionNumber": 1,
+          "price": 100
+        },
+        {
+          "sectionNumber": 2,
+          "price": 150
+        }
+      ]
+    },
+    {
+      "id": "3",
+      "plateNumber": "DK-890-CC",
+      "line": "Ligne 3",
+      "driver": "Cheikh Ndiaye",
+      "status": "Garage",
+      "seats": 45,
+      "sections": [
+        {
+          "sectionNumber": 1,
+          "price": 200
+        },
+        {
+          "sectionNumber": 2,
+          "price": 250
+        },
+        {
+          "sectionNumber": 3,
+          "price": 300
+        },
+        {
+          "sectionNumber": 4,
+          "price": 150
+        }
+      ]
+    }
+  ]
+}

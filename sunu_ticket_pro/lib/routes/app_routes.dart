@@ -42,7 +42,7 @@ class AppRoutes {
     ),
     GetPage(
       name: dashboard,
-      page: () => const DashboardScreen(),
+      page: () => DashboardScreen(),
       transition: Transition.fadeIn,
     ),
   ];

@@ -16,7 +16,7 @@ class AppTheme {
         displayLarge: TextStyle(
           color: AppColors.textPrimary,
           fontWeight: FontWeight.bold,
-          fontFamily: 'Poppins', 
+          fontFamily: 'Poppins',
         ),
         displayMedium: TextStyle(
           color: AppColors.textPrimary,
@@ -42,9 +42,7 @@ class AppTheme {
           backgroundColor: AppColors.primary,
           foregroundColor: AppColors.white,
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-          ),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         ),
       ),
       inputDecorationTheme: InputDecorationTheme(
