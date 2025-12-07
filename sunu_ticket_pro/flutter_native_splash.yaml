@@ -1,0 +1,21 @@
+flutter_native_splash:
+  color: "#E0F7FA"
+  image: assets/splash_screen_pro.png
+  icon_background_color: "#E0F7FA"
+  branding: assets/logo_pro.png
+  branding_width: 100
+  branding_height: 100
+  
+  # Android configuration
+  android: true
+  android_gravity: center
+  android_12:
+    image: assets/splash_screen_pro.png
+    icon_background_color: "#E0F7FA"
+  
+  # iOS configuration
+  ios: true
+  ios_content_mode: scaleAspectFit
+  
+  # Remove default branding
+  fullscreen: true
