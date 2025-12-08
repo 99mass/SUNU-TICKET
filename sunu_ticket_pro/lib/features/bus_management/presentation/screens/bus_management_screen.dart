@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sunu_ticket_pro/core/constants/app_colors.dart';
 import 'package:sunu_ticket_pro/features/bus_management/presentation/controllers/bus_controller.dart';
+import 'package:sunu_ticket_pro/features/session_management/presentation/screens/generate_code_screen.dart';
+import 'package:sunu_ticket_pro/features/driver_management/presentation/controllers/driver_controller.dart';
+import 'package:sunu_ticket_pro/features/driver_management/data/models/driver_model.dart';
 
 class BusManagementScreen extends StatefulWidget {
   const BusManagementScreen({super.key});
@@ -19,13 +22,10 @@ class _BusManagementScreenState extends State<BusManagementScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F7FA),
       appBar: AppBar(
-        title: selectedBuses.isEmpty
-            ? const Text("Gestion des Bus")
-            : Text("${selectedBuses.length} bus sélectionné(s)"),
+        title: const Text("Gestion des Bus"),
         backgroundColor: AppColors.primary,
         foregroundColor: Colors.white,
         elevation: 0,
-        centerTitle: true,
         actions: selectedBuses.isNotEmpty
             ? [
                 IconButton(
@@ -407,6 +407,27 @@ class _BusManagementScreenState extends State<BusManagementScreen> {
                   ),
                 ),
               ],
+              const SizedBox(height: 30),
+              // Bouton Générer Code d'Accès
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  onPressed: () {
+                    Get.back(); // Fermer le detail sheet
+                    _showGenerateCodeScreen(context, bus);
+                  },
+                  icon: const Icon(Icons.vpn_key),
+                  label: const Text('Générer Code d\'Accès'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.secondary,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                ),
+              ),
             ],
           ),
         ),
@@ -447,6 +468,17 @@ class _BusManagementScreenState extends State<BusManagementScreen> {
       isScrollControlled: true,
       builder: (context) =>
           _EditBusSheet(busController: busController, bus: bus),
+    );
+  }
+
+  void _showGenerateCodeScreen(BuildContext context, Map<String, dynamic> bus) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => GenerateCodeScreen(
+          busId: bus['id'],
+          busMatricule: bus['plateNumber'],
+        ),
+      ),
     );
   }
 
@@ -534,18 +566,20 @@ class _AddBusSheet extends StatefulWidget {
 class _AddBusSheetState extends State<_AddBusSheet> {
   late TextEditingController plateNumberController;
   late TextEditingController lineController;
-  late TextEditingController driverController;
   late TextEditingController seatsController;
   late TextEditingController numberOfSectionsController;
   final sectionPriceControllers = <TextEditingController>[];
   int numberOfSections = 0;
+
+  // Driver management
+  final DriverController driverController = Get.put(DriverController());
+  Driver? selectedDriver;
 
   @override
   void initState() {
     super.initState();
     plateNumberController = TextEditingController();
     lineController = TextEditingController();
-    driverController = TextEditingController();
     seatsController = TextEditingController();
     numberOfSectionsController = TextEditingController();
   }
@@ -662,32 +696,47 @@ class _AddBusSheetState extends State<_AddBusSheet> {
               ),
             ),
             const SizedBox(height: 16),
-            TextField(
-              controller: driverController,
-              decoration: InputDecoration(
-                labelText: "Chauffeur",
-                prefixIcon: const Icon(
-                  Icons.person,
-                  size: 18,
-                  color: AppColors.primary,
-                ),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: Colors.grey[300]!),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: Colors.grey[300]!, width: 1),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: const BorderSide(
-                    color: AppColors.primary,
-                    width: 2,
+            // Driver Dropdown - Add Bus Sheet
+            Obx(
+              () => DropdownButton<Driver>(
+                isExpanded: true,
+                value: selectedDriver,
+                hint: const Text('Sélectionner un chauffeur'),
+                items: [
+                  ...driverController.activeDrivers.map((driver) {
+                    return DropdownMenuItem(
+                      value: driver,
+                      child: Text(driver.name),
+                    );
+                  }),
+                  DropdownMenuItem(
+                    value: null,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(vertical: 8),
+                      decoration: BoxDecoration(
+                        border: Border(
+                          top: BorderSide(color: Colors.grey[300]!),
+                        ),
+                      ),
+                      child: const Row(
+                        children: [
+                          Icon(Icons.add, size: 18),
+                          SizedBox(width: 8),
+                          Text('Ajouter nouveau chauffeur'),
+                        ],
+                      ),
+                    ),
                   ),
-                ),
-                filled: true,
-                fillColor: Colors.grey[50],
+                ],
+                onChanged: (selected) {
+                  if (selected == null) {
+                    _showAddDriverDialog();
+                  } else {
+                    setState(() {
+                      selectedDriver = selected;
+                    });
+                  }
+                },
               ),
             ),
             const SizedBox(height: 16),
@@ -773,42 +822,47 @@ class _AddBusSheetState extends State<_AddBusSheet> {
                 ),
               ),
               const SizedBox(height: 12),
-              ...List.generate(
-                numberOfSections,
-                (index) => Padding(
-                  padding: const EdgeInsets.only(bottom: 12),
-                  child: TextField(
-                    controller: sectionPriceControllers[index],
-                    keyboardType: TextInputType.number,
-                    decoration: InputDecoration(
-                      labelText: "Section ${index + 1}",
-                      hintText: "ex: 150",
-                      prefixIcon: const Icon(
-                        Icons.money,
-                        size: 18,
-                        color: AppColors.primary,
-                      ),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(color: Colors.grey[300]!),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(
-                          color: Colors.grey[300]!,
-                          width: 1,
-                        ),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: const BorderSide(
-                          color: AppColors.primary,
-                          width: 2,
-                        ),
-                      ),
-                      filled: true,
-                      fillColor: Colors.grey[50],
+              GridView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  crossAxisSpacing: 12,
+                  mainAxisSpacing: 16,
+                  childAspectRatio: 4,
+                ),
+                itemCount: numberOfSections,
+                itemBuilder: (context, index) => TextField(
+                  controller: sectionPriceControllers[index],
+                  keyboardType: TextInputType.number,
+                  decoration: InputDecoration(
+                    labelText: "Section ${index + 1}",
+                    hintText: "ex: 150",
+                    prefixIcon: const Icon(
+                      Icons.money,
+                      size: 18,
+                      color: AppColors.primary,
                     ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide(color: Colors.grey[300]!),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide(
+                        color: Colors.grey[300]!,
+                        width: 1,
+                      ),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: const BorderSide(
+                        color: AppColors.primary,
+                        width: 2,
+                      ),
+                    ),
+                    filled: true,
+                    fillColor: Colors.grey[50],
                   ),
                 ),
               ),
@@ -818,6 +872,13 @@ class _AddBusSheetState extends State<_AddBusSheet> {
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: () {
+                  if (selectedDriver == null) {
+                    Get.snackbar(
+                      'Erreur',
+                      'Veuillez sélectionner un chauffeur',
+                    );
+                    return;
+                  }
                   final sections = <Map<String, dynamic>>[];
                   for (int i = 0; i < numberOfSections; i++) {
                     sections.add({
@@ -830,7 +891,7 @@ class _AddBusSheetState extends State<_AddBusSheet> {
                     'id': DateTime.now().toString(),
                     'plateNumber': plateNumberController.text,
                     'line': lineController.text,
-                    'driver': driverController.text,
+                    'driver': selectedDriver!.name,
                     'status': 'En service',
                     'seats': int.tryParse(seatsController.text) ?? 45,
                     'sections': sections,
@@ -853,6 +914,70 @@ class _AddBusSheetState extends State<_AddBusSheet> {
       ),
     );
   }
+
+  void _showAddDriverDialog() {
+    final nameController = TextEditingController();
+    final licenseController = TextEditingController();
+    final phoneController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Ajouter un Chauffeur'),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: nameController,
+                decoration: const InputDecoration(
+                  labelText: 'Nom',
+                  hintText: 'Ex: Ousmane Ba',
+                ),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: licenseController,
+                decoration: const InputDecoration(
+                  labelText: 'Numéro de Permis',
+                  hintText: 'Ex: SN-2021-0001',
+                ),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: phoneController,
+                decoration: const InputDecoration(
+                  labelText: 'Téléphone',
+                  hintText: 'Ex: +221 77 111 22 33',
+                ),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(onPressed: () => Get.back(), child: const Text('Annuler')),
+          ElevatedButton(
+            onPressed: () async {
+              final result = await driverController.createDriver(
+                name: nameController.text,
+                licenseNumber: licenseController.text,
+                phoneNumber: phoneController.text,
+              );
+              if (result != null) {
+                setState(() {
+                  selectedDriver = result;
+                });
+                Get.back();
+                Get.snackbar('Succès', 'Chauffeur ajouté');
+              }
+            },
+            style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary),
+            child: const Text('Ajouter'),
+          ),
+        ],
+      ),
+    );
+  }
 }
 
 class _EditBusSheet extends StatefulWidget {
@@ -868,12 +993,15 @@ class _EditBusSheet extends StatefulWidget {
 class _EditBusSheetState extends State<_EditBusSheet> {
   late TextEditingController plateNumberController;
   late TextEditingController lineController;
-  late TextEditingController driverController;
   late TextEditingController seatsController;
   late TextEditingController numberOfSectionsController;
   final sectionPriceControllers = <TextEditingController>[];
   late List<Map<String, dynamic>> sections;
   late String currentStatus;
+
+  // Driver management
+  final DriverController driverController = Get.put(DriverController());
+  Driver? selectedDriver;
 
   @override
   void initState() {
@@ -884,13 +1012,20 @@ class _EditBusSheetState extends State<_EditBusSheet> {
       text: widget.bus['plateNumber'],
     );
     lineController = TextEditingController(text: widget.bus['line']);
-    driverController = TextEditingController(text: widget.bus['driver']);
     seatsController = TextEditingController(
       text: widget.bus['seats'].toString(),
     );
     numberOfSectionsController = TextEditingController(
       text: sections.length.toString(),
     );
+
+    // Initialize selected driver from bus data
+    final driverName = widget.bus['driver'] as String?;
+    if (driverName != null) {
+      selectedDriver = driverController.activeDrivers.firstWhereOrNull(
+        (driver) => driver.name == driverName,
+      );
+    }
 
     for (var section in sections) {
       sectionPriceControllers.add(
@@ -1011,32 +1146,47 @@ class _EditBusSheetState extends State<_EditBusSheet> {
               ),
             ),
             const SizedBox(height: 16),
-            TextField(
-              controller: driverController,
-              decoration: InputDecoration(
-                labelText: "Chauffeur",
-                prefixIcon: const Icon(
-                  Icons.person,
-                  size: 18,
-                  color: AppColors.primary,
-                ),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: Colors.grey[300]!),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: Colors.grey[300]!, width: 1),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: const BorderSide(
-                    color: AppColors.primary,
-                    width: 2,
+            // Driver Dropdown - Edit Bus Sheet
+            Obx(
+              () => DropdownButton<Driver>(
+                isExpanded: true,
+                value: selectedDriver,
+                hint: const Text('Sélectionner un chauffeur'),
+                items: [
+                  ...driverController.activeDrivers.map((driver) {
+                    return DropdownMenuItem(
+                      value: driver,
+                      child: Text(driver.name),
+                    );
+                  }),
+                  DropdownMenuItem(
+                    value: null,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(vertical: 8),
+                      decoration: BoxDecoration(
+                        border: Border(
+                          top: BorderSide(color: Colors.grey[300]!),
+                        ),
+                      ),
+                      child: const Row(
+                        children: [
+                          Icon(Icons.add, size: 18),
+                          SizedBox(width: 8),
+                          Text('Ajouter nouveau chauffeur'),
+                        ],
+                      ),
+                    ),
                   ),
-                ),
-                filled: true,
-                fillColor: Colors.grey[50],
+                ],
+                onChanged: (selected) {
+                  if (selected == null) {
+                    _showAddDriverDialog();
+                  } else {
+                    setState(() {
+                      selectedDriver = selected;
+                    });
+                  }
+                },
               ),
             ),
             const SizedBox(height: 16),
@@ -1079,6 +1229,7 @@ class _EditBusSheetState extends State<_EditBusSheet> {
                   int oldCount = sections.length;
 
                   if (newCount > oldCount) {
+                    // Ajouter de nouvelles sections
                     for (int i = oldCount; i < newCount; i++) {
                       sections.add({'sectionNumber': i + 1, 'price': 0});
                       sectionPriceControllers.add(
@@ -1086,11 +1237,17 @@ class _EditBusSheetState extends State<_EditBusSheet> {
                       );
                     }
                   } else if (newCount < oldCount) {
+                    // Supprimer les sections à la fin
                     for (int i = newCount; i < oldCount; i++) {
                       sectionPriceControllers[i].dispose();
                     }
                     sections.removeRange(newCount, oldCount);
                     sectionPriceControllers.removeRange(newCount, oldCount);
+
+                    // Mettre à jour les numéros de section pour les sections restantes
+                    for (int i = 0; i < sections.length; i++) {
+                      sections[i]['sectionNumber'] = i + 1;
+                    }
                   }
                 });
               },
@@ -1180,41 +1337,46 @@ class _EditBusSheetState extends State<_EditBusSheet> {
                 ),
               ),
               const SizedBox(height: 12),
-              ...List.generate(
-                sections.length,
-                (index) => Padding(
-                  padding: const EdgeInsets.only(bottom: 12),
-                  child: TextField(
-                    controller: sectionPriceControllers[index],
-                    keyboardType: TextInputType.number,
-                    decoration: InputDecoration(
-                      labelText: "Section ${sections[index]['sectionNumber']}",
-                      prefixIcon: const Icon(
-                        Icons.money,
-                        size: 18,
-                        color: AppColors.primary,
-                      ),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(color: Colors.grey[300]!),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(
-                          color: Colors.grey[300]!,
-                          width: 1,
-                        ),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: const BorderSide(
-                          color: AppColors.primary,
-                          width: 2,
-                        ),
-                      ),
-                      filled: true,
-                      fillColor: Colors.grey[50],
+              GridView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  crossAxisSpacing: 12,
+                  mainAxisSpacing: 16,
+                  childAspectRatio: 4,
+                ),
+                itemCount: sections.length,
+                itemBuilder: (context, index) => TextField(
+                  controller: sectionPriceControllers[index],
+                  keyboardType: TextInputType.number,
+                  decoration: InputDecoration(
+                    labelText: "Section ${sections[index]['sectionNumber']}",
+                    prefixIcon: const Icon(
+                      Icons.money,
+                      size: 18,
+                      color: AppColors.primary,
                     ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide(color: Colors.grey[300]!),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide(
+                        color: Colors.grey[300]!,
+                        width: 1,
+                      ),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: const BorderSide(
+                        color: AppColors.primary,
+                        width: 2,
+                      ),
+                    ),
+                    filled: true,
+                    fillColor: Colors.grey[50],
                   ),
                 ),
               ),
@@ -1232,7 +1394,7 @@ class _EditBusSheetState extends State<_EditBusSheet> {
                     ...widget.bus,
                     'plateNumber': plateNumberController.text,
                     'line': lineController.text,
-                    'driver': driverController.text,
+                    'driver': selectedDriver?.name ?? widget.bus['driver'],
                     'seats': int.tryParse(seatsController.text) ?? 45,
                     'status': currentStatus,
                     'sections': sections,
@@ -1252,6 +1414,70 @@ class _EditBusSheetState extends State<_EditBusSheet> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  void _showAddDriverDialog() {
+    final nameController = TextEditingController();
+    final licenseController = TextEditingController();
+    final phoneController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Ajouter un Chauffeur'),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: nameController,
+                decoration: const InputDecoration(
+                  labelText: 'Nom',
+                  hintText: 'Ex: Ousmane Ba',
+                ),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: licenseController,
+                decoration: const InputDecoration(
+                  labelText: 'Numéro de Permis',
+                  hintText: 'Ex: SN-2021-0001',
+                ),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: phoneController,
+                decoration: const InputDecoration(
+                  labelText: 'Téléphone',
+                  hintText: 'Ex: +221 77 111 22 33',
+                ),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(onPressed: () => Get.back(), child: const Text('Annuler')),
+          ElevatedButton(
+            onPressed: () async {
+              final result = await driverController.createDriver(
+                name: nameController.text,
+                licenseNumber: licenseController.text,
+                phoneNumber: phoneController.text,
+              );
+              if (result != null) {
+                setState(() {
+                  selectedDriver = result;
+                });
+                Get.back();
+                Get.snackbar('Succès', 'Chauffeur ajouté');
+              }
+            },
+            style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary),
+            child: const Text('Ajouter'),
+          ),
+        ],
       ),
     );
   }

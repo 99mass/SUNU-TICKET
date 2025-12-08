@@ -6,6 +6,7 @@ import 'package:sunu_ticket_pro/features/dashboard/presentation/controllers/dash
 import 'package:sunu_ticket_pro/features/profile/presentation/screens/profile_screen.dart';
 import 'package:sunu_ticket_pro/features/reports/presentation/screens/reports_screen.dart';
 import 'package:sunu_ticket_pro/features/bus_management/presentation/screens/bus_management_screen.dart';
+import 'package:sunu_ticket_pro/features/personnel_management/presentation/screens/personnel_management_screen.dart';
 
 class DashboardScreen extends StatelessWidget {
   DashboardScreen({super.key});
@@ -37,19 +38,24 @@ class DashboardScreen extends StatelessWidget {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text(
-                              "Bus en activité",
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.grey[800],
+                            Expanded(
+                              flex: 3,
+                              child: Text(
+                                "Bus en activité Aujourd'hui",
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.grey[800],
+                                ),
                               ),
                             ),
-                            TextButton(
-                              onPressed: () {
-                                // TODO: Navigate to full bus list
-                              },
-                              child: const Text("Voir tout"),
+                            Expanded(
+                              child: TextButton(
+                                onPressed: () {
+                                  // TODO: Navigate to full bus list
+                                },
+                                child: const Text("Voir tout"),
+                              ),
                             ),
                           ],
                         ),
@@ -76,6 +82,8 @@ class DashboardScreen extends StatelessWidget {
             return BusManagementScreen();
           case 2:
             return const ReportsScreen();
+          case 3:
+            return const PersonnelManagementScreen();
           default:
             return Container();
         }
@@ -102,6 +110,10 @@ class DashboardScreen extends StatelessWidget {
             BottomNavigationBarItem(
               icon: Icon(Icons.analytics),
               label: 'Rapport',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.people),
+              label: 'Personnel',
             ),
           ],
         ),

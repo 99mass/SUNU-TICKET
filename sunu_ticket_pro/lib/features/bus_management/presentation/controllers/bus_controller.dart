@@ -1,8 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
-import 'package:flutter/services.dart';
-import 'dart:convert';
-import 'package:sunu_ticket_pro/features/bus_management/data/models/bus_model.dart';
+
+import '../../data/repositories/bus_repository.dart';
 
 class BusController extends GetxController {
   // Liste des bus
@@ -10,6 +9,9 @@ class BusController extends GetxController {
 
   // Statuts possibles
   final statusList = ['En service', 'Garage', 'En maintenance'].obs;
+
+  // Repository
+  final BusRepository _busRepository = BusRepository();
 
   @override
   void onInit() {
@@ -19,15 +21,8 @@ class BusController extends GetxController {
 
   Future<void> loadBusesFromJson() async {
     try {
-      final String jsonString = await rootBundle.loadString(
-        'assets/mocks/buses.json',
-      );
-      final Map<String, dynamic> jsonMap = json.decode(jsonString);
-      final List<dynamic> busesData = jsonMap['buses'] ?? [];
-
-      buses.value = busesData
-          .map((bus) => Bus.fromJson(bus as Map<String, dynamic>).toMap())
-          .toList();
+      final busesList = await _busRepository.loadBuses();
+      buses.value = busesList.map((bus) => bus.toMap()).toList();
       debugPrint('✅ Bus chargés: ${buses.length} bus');
     } catch (e) {
       debugPrint('❌ Erreur lors du chargement des bus: $e');

@@ -1,0 +1,20 @@
+[
+  {
+    "id": "RCV001",
+    "name": "Amadou Ndiaye",
+    "phone_number": "+221 77 123 45 67",
+    "status": "active"
+  },
+  {
+    "id": "RCV002",
+    "name": "Fatou Sall",
+    "phone_number": "+221 77 234 56 78",
+    "status": "active"
+  },
+  {
+    "id": "RCV003",
+    "name": "Moussa Diallo",
+    "phone_number": "+221 77 345 67 89",
+    "status": "active"
+  }
+]

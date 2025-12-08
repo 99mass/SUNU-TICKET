@@ -1,0 +1,23 @@
+[
+  {
+    "id": "DRV001",
+    "name": "Ousmane Ba",
+    "license_number": "SN-2021-0001",
+    "phone_number": "+221 77 111 22 33",
+    "status": "active"
+  },
+  {
+    "id": "DRV002",
+    "name": "Samba Diop",
+    "license_number": "SN-2020-0045",
+    "phone_number": "+221 77 222 33 44",
+    "status": "active"
+  },
+  {
+    "id": "DRV003",
+    "name": "Mamadou Kane",
+    "license_number": "SN-2022-0089",
+    "phone_number": "+221 77 333 44 55",
+    "status": "active"
+  }
+]

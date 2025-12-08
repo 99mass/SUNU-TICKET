@@ -7,6 +7,8 @@
       "driver": "Moussa Diop",
       "status": "En service",
       "seats": 45,
+      "departureDate": "2025-12-08",
+      "departureTime": "08:30",
       "sections": [
         {
           "sectionNumber": 1,
@@ -29,6 +31,8 @@
       "driver": "Alioune Fall",
       "status": "En service",
       "seats": 50,
+      "departureDate": "2025-12-08",
+      "departureTime": "10:00",
       "sections": [
         {
           "sectionNumber": 1,
@@ -47,6 +51,8 @@
       "driver": "Cheikh Ndiaye",
       "status": "Garage",
       "seats": 45,
+      "departureDate": "2025-12-08",
+      "departureTime": "14:00",
       "sections": [
         {
           "sectionNumber": 1,
@@ -63,6 +69,26 @@
         {
           "sectionNumber": 4,
           "price": 150
+        }
+      ]
+    },
+    {
+      "id": "4",
+      "plateNumber": "DK-456-DD",
+      "line": "Ligne 7",
+      "driver": "Amadou Sow",
+      "status": "En service",
+      "seats": 48,
+      "departureDate": "2025-12-09",
+      "departureTime": "16:30",
+      "sections": [
+        {
+          "sectionNumber": 1,
+          "price": 120
+        },
+        {
+          "sectionNumber": 2,
+          "price": 180
         }
       ]
     }
