@@ -639,7 +639,8 @@ class _AddBusSheetState extends State<_AddBusSheet> {
   int numberOfSections = 0;
 
   // Driver management
-  final DriverController driverController = Get.put(DriverController());
+  // final DriverController driverController = Get.put(DriverController());
+  late DriverController driverController;
   Driver? selectedDriver;
 
   @override
@@ -649,6 +650,8 @@ class _AddBusSheetState extends State<_AddBusSheet> {
     lineController = TextEditingController();
     seatsController = TextEditingController();
     numberOfSectionsController = TextEditingController();
+
+    driverController = Get.put(DriverController());
   }
 
   @override
@@ -661,6 +664,11 @@ class _AddBusSheetState extends State<_AddBusSheet> {
     for (var controller in sectionPriceControllers) {
       controller.dispose();
     }
+
+    if (Get.isRegistered<DriverController>()) {
+      Get.delete<DriverController>();
+    }
+
     super.dispose();
   }
 
@@ -764,48 +772,73 @@ class _AddBusSheetState extends State<_AddBusSheet> {
             ),
             const SizedBox(height: 16),
             // Driver Dropdown - Add Bus Sheet
-            Obx(
-              () => DropdownButton<Driver>(
-                isExpanded: true,
-                value: selectedDriver,
-                hint: const Text('Sélectionner un chauffeur'),
-                items: [
-                  ...driverController.activeDrivers.map((driver) {
-                    return DropdownMenuItem(
-                      value: driver,
-                      child: Text(driver.name),
-                    );
-                  }),
-                  DropdownMenuItem(
-                    value: null,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(vertical: 8),
-                      decoration: BoxDecoration(
-                        border: Border(
-                          top: BorderSide(color: Colors.grey[300]!),
+            Obx(() {
+              if (!Get.isRegistered<DriverController>()) {
+                return Container(); // Ou un autre widget par défaut
+              }
+              return Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 4,
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.grey[50],
+                  border: Border.all(color: Colors.grey[300]!),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: DropdownButton<Driver>(
+                  isExpanded: true,
+                  dropdownColor: AppColors.white,
+                  underline: Container(),
+                  value: selectedDriver,
+                  hint: const Text('Sélectionner un chauffeur'),
+                  items: [
+                    ...driverController.activeDrivers.map((driver) {
+                      return DropdownMenuItem(
+                        value: driver,
+                        child: Text(driver.name),
+                      );
+                    }),
+                    DropdownMenuItem(
+                      value: null,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(vertical: 8),
+                        decoration: BoxDecoration(
+                          border: Border.all(color: AppColors.white),
+                        ),
+                        child: const Row(
+                          children: [
+                            Icon(
+                              Icons.person_add,
+                              size: 18,
+                              color: AppColors.primary,
+                            ),
+                            SizedBox(width: 16),
+                            Text(
+                              'Ajouter nouveau chauffeur',
+                              style: TextStyle(
+                                color: AppColors.textPrimary,
+                                fontWeight: FontWeight.w500,
+                                fontSize: 15,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                      child: const Row(
-                        children: [
-                          Icon(Icons.add, size: 18),
-                          SizedBox(width: 8),
-                          Text('Ajouter nouveau chauffeur'),
-                        ],
-                      ),
                     ),
-                  ),
-                ],
-                onChanged: (selected) {
-                  if (selected == null) {
-                    _showAddDriverDialog();
-                  } else {
-                    setState(() {
-                      selectedDriver = selected;
-                    });
-                  }
-                },
-              ),
-            ),
+                  ],
+                  onChanged: (selected) {
+                    if (selected == null) {
+                      _showAddDriverDialog();
+                    } else {
+                      setState(() {
+                        selectedDriver = selected;
+                      });
+                    }
+                  },
+                ),
+              );
+            }),
             const SizedBox(height: 16),
             TextField(
               controller: seatsController,
@@ -990,7 +1023,15 @@ class _AddBusSheetState extends State<_AddBusSheet> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Ajouter un Chauffeur'),
+        backgroundColor: Colors.white,
+        title: const Text(
+          'Ajouter un Chauffeur',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Colors.black,
+            fontSize: 16,
+          ),
+        ),
         content: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -1000,6 +1041,14 @@ class _AddBusSheetState extends State<_AddBusSheet> {
                 decoration: const InputDecoration(
                   labelText: 'Nom',
                   hintText: 'Ex: Ousmane Ba',
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(
+                      color: AppColors.primary,
+                      width: 1.0,
+                      style: BorderStyle.solid,
+                    ),
+                    borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                  ),
                 ),
               ),
               const SizedBox(height: 12),
@@ -1008,6 +1057,14 @@ class _AddBusSheetState extends State<_AddBusSheet> {
                 decoration: const InputDecoration(
                   labelText: 'Numéro de Permis',
                   hintText: 'Ex: SN-2021-0001',
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(
+                      color: AppColors.primary,
+                      width: 1.0,
+                      style: BorderStyle.solid,
+                    ),
+                    borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                  ),
                 ),
               ),
               const SizedBox(height: 12),
@@ -1016,6 +1073,14 @@ class _AddBusSheetState extends State<_AddBusSheet> {
                 decoration: const InputDecoration(
                   labelText: 'Téléphone',
                   hintText: 'Ex: +221 77 111 22 33',
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(
+                      color: AppColors.primary,
+                      width: 1.0,
+                      style: BorderStyle.solid,
+                    ),
+                    borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                  ),
                 ),
               ),
             ],
@@ -1215,45 +1280,65 @@ class _EditBusSheetState extends State<_EditBusSheet> {
             const SizedBox(height: 16),
             // Driver Dropdown - Edit Bus Sheet
             Obx(
-              () => DropdownButton<Driver>(
-                isExpanded: true,
-                value: selectedDriver,
-                hint: const Text('Sélectionner un chauffeur'),
-                items: [
-                  ...driverController.activeDrivers.map((driver) {
-                    return DropdownMenuItem(
-                      value: driver,
-                      child: Text(driver.name),
-                    );
-                  }),
-                  DropdownMenuItem(
-                    value: null,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(vertical: 8),
-                      decoration: BoxDecoration(
-                        border: Border(
-                          top: BorderSide(color: Colors.grey[300]!),
+              () => Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 4,
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.grey[50],
+                  border: Border.all(color: Colors.grey[300]!),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: DropdownButton<Driver>(
+                  dropdownColor: AppColors.white,
+                  isExpanded: true,
+                  underline: Container(),
+                  value: selectedDriver,
+                  hint: const Text('Sélectionner un chauffeur'),
+                  items: [
+                    ...driverController.activeDrivers.map((driver) {
+                      return DropdownMenuItem(
+                        value: driver,
+                        child: Text(driver.name),
+                      );
+                    }),
+                    DropdownMenuItem(
+                      value: null,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(vertical: 8),
+
+                        child: const Row(
+                          children: [
+                            Icon(
+                              Icons.person_add,
+                              size: 18,
+                              color: AppColors.primary,
+                            ),
+                            SizedBox(width: 16),
+                            Text(
+                              'Ajouter nouveau chauffeur',
+                              style: TextStyle(
+                                color: AppColors.textPrimary,
+                                fontSize: 15,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                      child: const Row(
-                        children: [
-                          Icon(Icons.add, size: 18),
-                          SizedBox(width: 8),
-                          Text('Ajouter nouveau chauffeur'),
-                        ],
-                      ),
                     ),
-                  ),
-                ],
-                onChanged: (selected) {
-                  if (selected == null) {
-                    _showAddDriverDialog();
-                  } else {
-                    setState(() {
-                      selectedDriver = selected;
-                    });
-                  }
-                },
+                  ],
+                  onChanged: (selected) {
+                    if (selected == null) {
+                      _showAddDriverDialog();
+                    } else {
+                      setState(() {
+                        selectedDriver = selected;
+                      });
+                    }
+                  },
+                ),
               ),
             ),
             const SizedBox(height: 16),
@@ -1493,7 +1578,15 @@ class _EditBusSheetState extends State<_EditBusSheet> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Ajouter un Chauffeur'),
+        backgroundColor: Colors.white,
+        title: const Text(
+          'Ajouter un Chauffeur',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Colors.black,
+            fontSize: 16,
+          ),
+        ),
         content: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -1503,6 +1596,14 @@ class _EditBusSheetState extends State<_EditBusSheet> {
                 decoration: const InputDecoration(
                   labelText: 'Nom',
                   hintText: 'Ex: Ousmane Ba',
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(
+                      color: AppColors.primary,
+                      width: 1.0,
+                      style: BorderStyle.solid,
+                    ),
+                    borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                  ),
                 ),
               ),
               const SizedBox(height: 12),
@@ -1511,6 +1612,14 @@ class _EditBusSheetState extends State<_EditBusSheet> {
                 decoration: const InputDecoration(
                   labelText: 'Numéro de Permis',
                   hintText: 'Ex: SN-2021-0001',
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(
+                      color: AppColors.primary,
+                      width: 1.0,
+                      style: BorderStyle.solid,
+                    ),
+                    borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                  ),
                 ),
               ),
               const SizedBox(height: 12),
@@ -1519,6 +1628,14 @@ class _EditBusSheetState extends State<_EditBusSheet> {
                 decoration: const InputDecoration(
                   labelText: 'Téléphone',
                   hintText: 'Ex: +221 77 111 22 33',
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(
+                      color: AppColors.primary,
+                      width: 1.0,
+                      style: BorderStyle.solid,
+                    ),
+                    borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                  ),
                 ),
               ),
             ],
