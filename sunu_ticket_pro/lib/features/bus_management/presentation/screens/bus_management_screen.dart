@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:sunu_ticket_pro/core/constants/app_colors.dart';
-import 'package:sunu_ticket_pro/features/bus_management/presentation/controllers/bus_controller.dart';
-import 'package:sunu_ticket_pro/features/session_management/presentation/screens/generate_code_screen.dart';
-import 'package:sunu_ticket_pro/features/driver_management/presentation/controllers/driver_controller.dart';
-import 'package:sunu_ticket_pro/features/driver_management/data/models/driver_model.dart';
+import '../../../../../core/constants/app_colors.dart';
+import '../../../bus_management/presentation/controllers/bus_controller.dart';
+import '../../../session_management/presentation/screens/generate_code_screen.dart';
+import '../../../driver_management/presentation/controllers/driver_controller.dart';
+import '../../../driver_management/data/models/driver_model.dart';
+import '../../../session_management/presentation/controllers/session_controller.dart';
 
 class BusManagementScreen extends StatefulWidget {
   const BusManagementScreen({super.key});
@@ -15,6 +17,7 @@ class BusManagementScreen extends StatefulWidget {
 
 class _BusManagementScreenState extends State<BusManagementScreen> {
   final BusController busController = Get.put(BusController());
+  final sessionController = Get.put(SessionController());
   final Set<String> selectedBuses = {};
 
   @override
@@ -315,6 +318,14 @@ class _BusManagementScreenState extends State<BusManagementScreen> {
   }
 
   void _showBusDetailSheet(BuildContext context, Map<String, dynamic> bus) {
+    final sessionController = Get.find<SessionController>();
+
+    final activeSession = sessionController.activeSessions.firstWhereOrNull(
+      (session) =>
+          session.busId == bus['id'] &&
+          !sessionController.isCodeExpired(session),
+    );
+
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
@@ -408,26 +419,81 @@ class _BusManagementScreenState extends State<BusManagementScreen> {
                 ),
               ],
               const SizedBox(height: 30),
-              // Bouton Générer Code d'Accès
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton.icon(
-                  onPressed: () {
-                    Get.back(); // Fermer le detail sheet
-                    _showGenerateCodeScreen(context, bus);
-                  },
-                  icon: const Icon(Icons.vpn_key),
-                  label: const Text('Générer Code d\'Accès'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.secondary,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
+              // Afficher le code d'accès généré et le receveur s'il existe
+              if (activeSession != null) ...[
+                Divider(height: 1, thickness: 1, color: Colors.grey[400]),
+                const SizedBox(height: 12),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "Code d'accès:",
+                      style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+                    ),
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Text(
+                          activeSession.code,
+                          style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.primary,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        GestureDetector(
+                          onTap: () {
+                            Clipboard.setData(
+                              ClipboardData(text: activeSession.code),
+                            );
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  'Code copié: ${activeSession.code}',
+                                ),
+                                duration: const Duration(seconds: 2),
+                                backgroundColor: Colors.green,
+                              ),
+                            );
+                          },
+                          child: Icon(
+                            Icons.copy,
+                            size: 18,
+                            color: AppColors.secondary,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                _buildDetailRow("Receveur", activeSession.receiverName),
+              ],
+              // Bouton Générer Code d'Accès (caché si un code est déjà généré et actif)
+              if (activeSession == null)
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton.icon(
+                    onPressed: () {
+                      sessionController
+                          .resetGeneratedCode(); // Réinitialiser le code généré
+                      Get.back(); // Fermer le detail sheet
+                      _showGenerateCodeScreen(context, bus);
+                    },
+                    icon: const Icon(Icons.vpn_key),
+                    label: const Text('Générer Code d\'Accès'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.secondary,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
                     ),
                   ),
                 ),
-              ),
             ],
           ),
         ),
@@ -477,6 +543,7 @@ class _BusManagementScreenState extends State<BusManagementScreen> {
         builder: (context) => GenerateCodeScreen(
           busId: bus['id'],
           busMatricule: bus['plateNumber'],
+          busLine: bus['line'],
         ),
       ),
     );

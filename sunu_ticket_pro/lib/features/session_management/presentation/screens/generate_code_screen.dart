@@ -9,10 +9,12 @@ import 'package:sunu_ticket_pro/features/receiver_management/data/models/receive
 class GenerateCodeScreen extends StatefulWidget {
   final String busId;
   final String busMatricule;
+  final String busLine;
 
   const GenerateCodeScreen({
     required this.busId,
     required this.busMatricule,
+    required this.busLine,
     super.key,
   });
 
@@ -81,6 +83,7 @@ class _GenerateCodeScreenState extends State<GenerateCodeScreen> {
               ),
               const SizedBox(height: 16),
               _buildInfoRow('Matricule', widget.busMatricule),
+              _buildInfoRow('Ligne', widget.busLine),
             ],
           ),
         ),
@@ -98,6 +101,7 @@ class _GenerateCodeScreenState extends State<GenerateCodeScreen> {
         Obx(
           () => DropdownButton<Receiver>(
             isExpanded: true,
+            dropdownColor: AppColors.white,
             value: receiverController.selectedReceiver.value,
             hint: const Text('Choisir un receveur'),
             items: [
@@ -112,7 +116,8 @@ class _GenerateCodeScreenState extends State<GenerateCodeScreen> {
                 child: Container(
                   padding: const EdgeInsets.symmetric(vertical: 8),
                   decoration: BoxDecoration(
-                    border: Border(top: BorderSide(color: Colors.grey[300]!)),
+                    color: AppColors.white,
+                    borderRadius: const BorderRadius.all(Radius.circular(8)),
                   ),
                   child: const Row(
                     children: [
@@ -189,12 +194,12 @@ class _GenerateCodeScreenState extends State<GenerateCodeScreen> {
           decoration: BoxDecoration(
             color: Colors.green.withAlpha((0.1 * 255).toInt()),
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.green, width: 2),
+            border: Border.all(color: Colors.green, width: 1),
           ),
-          child: Column(
+          child: Row(
             children: [
-              const Icon(Icons.check_circle, color: Colors.green, size: 48),
-              const SizedBox(height: 12),
+              const Icon(Icons.check_circle, color: Colors.green, size: 28),
+              const SizedBox(width: 12),
               const Text(
                 'Code Généré avec Succès!',
                 style: TextStyle(
@@ -373,7 +378,15 @@ class _GenerateCodeScreenState extends State<GenerateCodeScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Ajouter un Receveur'),
+        backgroundColor: AppColors.white,
+        title: const Text(
+          'Ajouter un Receveur',
+          style: TextStyle(
+            color: AppColors.textPrimary,
+            fontWeight: FontWeight.bold,
+            fontSize: 16,
+          ),
+        ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -382,7 +395,10 @@ class _GenerateCodeScreenState extends State<GenerateCodeScreen> {
               decoration: const InputDecoration(
                 labelText: 'Nom du receveur',
                 hintText: 'Ex: Amadou Ndiaye',
-                border: OutlineInputBorder(),
+                enabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: AppColors.primary, width: 1.0),
+                  borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                ),
               ),
             ),
             const SizedBox(height: 16),
@@ -391,7 +407,10 @@ class _GenerateCodeScreenState extends State<GenerateCodeScreen> {
               decoration: const InputDecoration(
                 labelText: 'Numéro de téléphone',
                 hintText: 'Ex: +221 77 123 45 67',
-                border: OutlineInputBorder(),
+                enabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: AppColors.primary, width: 1.0),
+                  borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                ),
               ),
             ),
           ],

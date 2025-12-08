@@ -530,7 +530,15 @@ class _PersonnelManagementScreenState extends State<PersonnelManagementScreen>
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Ajouter un Chauffeur'),
+        backgroundColor: Colors.white,
+        title: const Text(
+          'Ajouter un Chauffeur',
+          style: TextStyle(
+            color: Colors.black,
+            fontWeight: FontWeight.bold,
+            fontSize: 16,
+          ),
+        ),
         content: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -540,6 +548,14 @@ class _PersonnelManagementScreenState extends State<PersonnelManagementScreen>
                 decoration: const InputDecoration(
                   labelText: 'Nom',
                   hintText: 'Ex: Ousmane Ba',
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(
+                      color: AppColors.primary,
+                      width: 1.0,
+                      style: BorderStyle.solid,
+                    ),
+                    borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                  ),
                 ),
               ),
               const SizedBox(height: 12),
@@ -548,6 +564,14 @@ class _PersonnelManagementScreenState extends State<PersonnelManagementScreen>
                 decoration: const InputDecoration(
                   labelText: 'Numéro de Permis',
                   hintText: 'Ex: SN-2021-0001',
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(
+                      color: AppColors.primary,
+                      width: 1.0,
+                      style: BorderStyle.solid,
+                    ),
+                    borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                  ),
                 ),
               ),
               const SizedBox(height: 12),
@@ -556,6 +580,14 @@ class _PersonnelManagementScreenState extends State<PersonnelManagementScreen>
                 decoration: const InputDecoration(
                   labelText: 'Téléphone',
                   hintText: 'Ex: +221 77 111 22 33',
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(
+                      color: AppColors.primary,
+                      width: 1.0,
+                      style: BorderStyle.solid,
+                    ),
+                    borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                  ),
                 ),
               ),
             ],
@@ -591,26 +623,62 @@ class _PersonnelManagementScreenState extends State<PersonnelManagementScreen>
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Modifier le Chauffeur'),
+        backgroundColor: Colors.white,
+        title: const Text(
+          'Modifier le Chauffeur',
+          style: TextStyle(
+            color: Colors.black,
+            fontWeight: FontWeight.bold,
+            fontSize: 16,
+          ),
+        ),
         content: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               TextField(
                 controller: nameController,
-                decoration: const InputDecoration(labelText: 'Nom'),
+                decoration: const InputDecoration(
+                  labelText: 'Nom',
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(
+                      color: AppColors.primary,
+                      width: 1.0,
+                      style: BorderStyle.solid,
+                    ),
+                    borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                  ),
+                ),
               ),
               const SizedBox(height: 12),
               TextField(
                 controller: licenseController,
                 decoration: const InputDecoration(
                   labelText: 'Numéro de Permis',
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(
+                      color: AppColors.primary,
+                      width: 1.0,
+                      style: BorderStyle.solid,
+                    ),
+                    borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                  ),
                 ),
               ),
               const SizedBox(height: 12),
               TextField(
                 controller: phoneController,
-                decoration: const InputDecoration(labelText: 'Téléphone'),
+                decoration: const InputDecoration(
+                  labelText: 'Téléphone',
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(
+                      color: AppColors.primary,
+                      width: 1.0,
+                      style: BorderStyle.solid,
+                    ),
+                    borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                  ),
+                ),
               ),
             ],
           ),
@@ -637,7 +705,15 @@ class _PersonnelManagementScreenState extends State<PersonnelManagementScreen>
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Ajouter un Receveur'),
+        backgroundColor: Colors.white,
+        title: const Text(
+          'Ajouter un Receveur',
+          style: TextStyle(
+            color: Colors.black,
+            fontWeight: FontWeight.bold,
+            fontSize: 16,
+          ),
+        ),
         content: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -647,6 +723,14 @@ class _PersonnelManagementScreenState extends State<PersonnelManagementScreen>
                 decoration: const InputDecoration(
                   labelText: 'Nom',
                   hintText: 'Ex: Amadou Ndiaye',
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(
+                      color: AppColors.primary,
+                      width: 1.0,
+                      style: BorderStyle.solid,
+                    ),
+                    borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                  ),
                 ),
               ),
               const SizedBox(height: 12),
@@ -655,6 +739,14 @@ class _PersonnelManagementScreenState extends State<PersonnelManagementScreen>
                 decoration: const InputDecoration(
                   labelText: 'Téléphone',
                   hintText: 'Ex: +221 77 123 45 67',
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(
+                      color: AppColors.primary,
+                      width: 1.0,
+                      style: BorderStyle.solid,
+                    ),
+                    borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                  ),
                 ),
               ),
             ],
@@ -688,19 +780,47 @@ class _PersonnelManagementScreenState extends State<PersonnelManagementScreen>
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Modifier le Receveur'),
+        backgroundColor: Colors.white,
+        title: const Text(
+          'Modifier le Receveur',
+          style: TextStyle(
+            color: Colors.black,
+            fontWeight: FontWeight.bold,
+            fontSize: 16,
+          ),
+        ),
         content: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               TextField(
                 controller: nameController,
-                decoration: const InputDecoration(labelText: 'Nom'),
+                decoration: const InputDecoration(
+                  labelText: 'Nom',
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(
+                      color: AppColors.primary,
+                      width: 1.0,
+                      style: BorderStyle.solid,
+                    ),
+                    borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                  ),
+                ),
               ),
               const SizedBox(height: 12),
               TextField(
                 controller: phoneController,
-                decoration: const InputDecoration(labelText: 'Téléphone'),
+                decoration: const InputDecoration(
+                  labelText: 'Téléphone',
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(
+                      color: AppColors.primary,
+                      width: 1.0,
+                      style: BorderStyle.solid,
+                    ),
+                    borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                  ),
+                ),
               ),
             ],
           ),
@@ -723,6 +843,7 @@ class _PersonnelManagementScreenState extends State<PersonnelManagementScreen>
   void _showDeleteConfirmDialog(String message, VoidCallback onConfirm) {
     Get.dialog(
       AlertDialog(
+        backgroundColor: Colors.white,
         title: const Text('Confirmation'),
         content: Text(message),
         actions: [
