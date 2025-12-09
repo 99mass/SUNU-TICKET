@@ -43,3 +43,4 @@ flutter:
   assets:
     - assets/
     - lib/features/auth/data/datasources/mock_data/users.json
+    - lib/features/reports/data/datasources/mock_data/reports.json
