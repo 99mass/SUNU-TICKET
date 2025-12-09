@@ -24,6 +24,7 @@ class Bus {
   final String status;
   final int seats;
   final List<BusSection> sections;
+  final String? gie; // GIE to which the bus belongs
   final String? departureDate; // Format: YYYY-MM-DD
   final String? departureTime; // Format: HH:mm
 
@@ -35,6 +36,7 @@ class Bus {
     required this.status,
     required this.seats,
     required this.sections,
+    this.gie,
     this.departureDate,
     this.departureTime,
   });
@@ -52,6 +54,7 @@ class Bus {
               ?.map((e) => BusSection.fromJson(e as Map<String, dynamic>))
               .toList() ??
           [],
+      gie: json['gie'] as String?,
       departureDate: json['departureDate'] as String?,
       departureTime: json['departureTime'] as String?,
     );
@@ -66,6 +69,7 @@ class Bus {
       'status': status,
       'seats': seats,
       'sections': sections.map((e) => e.toJson()).toList(),
+      'gie': gie,
       'departureDate': departureDate,
       'departureTime': departureTime,
     };

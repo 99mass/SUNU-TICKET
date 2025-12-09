@@ -12,28 +12,7 @@ class AuthRepository {
       );
       return jsonDecode(jsonString);
     } catch (e) {
-      // Si le fichier n'est pas trouvé, retourner les données hardcodées
-      return {
-        "users": [
-          {
-            "id": "user_001",
-            "phone": "+221771234567",
-            "name": "Abdoulaye Diop",
-            "password": "1234",
-            "created_at": "2025-01-15T10:00:00Z",
-            "is_verified": true,
-          },
-          {
-            "id": "user_002",
-            "phone": "+221771234568",
-            "name": "Fatou Sall",
-            "password": "1234",
-            "created_at": "2025-02-10T14:30:00Z",
-            "is_verified": true,
-          },
-        ],
-        "otp_codes": {"+221771234567": "123456", "+221771234568": "654321"},
-      };
+      return {};
     }
   }
 

@@ -7,6 +7,7 @@ import '../../../session_management/presentation/screens/generate_code_screen.da
 import '../../../driver_management/presentation/controllers/driver_controller.dart';
 import '../../../driver_management/data/models/driver_model.dart';
 import '../../../session_management/presentation/controllers/session_controller.dart';
+import '../../../auth/presentation/controllers/auth_controller.dart';
 
 class BusManagementScreen extends StatefulWidget {
   const BusManagementScreen({super.key});
@@ -377,6 +378,8 @@ class _BusManagementScreenState extends State<BusManagementScreen> {
               const SizedBox(height: 12),
               _buildDetailRow("Chauffeur", bus['driver']),
               const SizedBox(height: 12),
+              _buildDetailRow("GIE", bus['gie'] ?? 'Non assigné'),
+              const SizedBox(height: 12),
               _buildDetailRow("Statut", bus['status']),
               const SizedBox(height: 12),
               _buildDetailRow("Capacité", "${bus['seats']} places"),
@@ -643,6 +646,10 @@ class _AddBusSheetState extends State<_AddBusSheet> {
   late DriverController driverController;
   Driver? selectedDriver;
 
+  // GIE management
+  late AuthController authController;
+  String? selectedGie;
+
   @override
   void initState() {
     super.initState();
@@ -652,6 +659,7 @@ class _AddBusSheetState extends State<_AddBusSheet> {
     numberOfSectionsController = TextEditingController();
 
     driverController = Get.put(DriverController());
+    authController = Get.find<AuthController>();
   }
 
   @override
@@ -670,6 +678,67 @@ class _AddBusSheetState extends State<_AddBusSheet> {
     }
 
     super.dispose();
+  }
+
+  List<String> _getUserGies() {
+    return authController.currentUser.value?.gieCompanies ?? [];
+  }
+
+  void _showAddGieDialog() {
+    final nameController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: Colors.white,
+        title: const Text(
+          'Ajouter un GIE',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Colors.black,
+            fontSize: 16,
+          ),
+        ),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: nameController,
+                decoration: const InputDecoration(
+                  labelText: 'Nom du GIE',
+                  hintText: 'Ex: GIE Dakar Transport',
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(
+                      color: AppColors.primary,
+                      width: 1.0,
+                      style: BorderStyle.solid,
+                    ),
+                    borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(onPressed: () => Get.back(), child: const Text('Annuler')),
+          ElevatedButton(
+            onPressed: () {
+              if (nameController.text.isNotEmpty) {
+                setState(() {
+                  selectedGie = nameController.text;
+                });
+                Get.back();
+                Get.snackbar('Succès', 'GIE ajouté');
+              }
+            },
+            style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary),
+            child: const Text('Ajouter'),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -840,6 +909,71 @@ class _AddBusSheetState extends State<_AddBusSheet> {
               );
             }),
             const SizedBox(height: 16),
+            // GIE Dropdown - Add Bus Sheet
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+              decoration: BoxDecoration(
+                color: Colors.grey[50],
+                border: Border.all(color: Colors.grey[300]!),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: DropdownButton<String>(
+                isExpanded: true,
+                dropdownColor: AppColors.white,
+                underline: Container(),
+                value: selectedGie,
+                hint: const Text('Sélectionner un GIE'),
+                items: [
+                  ...(() {
+                    final userGies = _getUserGies();
+                    final allGies =
+                        selectedGie != null && !userGies.contains(selectedGie)
+                        ? [...userGies, selectedGie!]
+                        : userGies;
+                    return allGies.map((gie) {
+                      return DropdownMenuItem(value: gie, child: Text(gie));
+                    });
+                  })(),
+                  DropdownMenuItem(
+                    value: null,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(vertical: 8),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: AppColors.white),
+                      ),
+                      child: const Row(
+                        children: [
+                          Icon(
+                            Icons.business,
+                            size: 18,
+                            color: AppColors.primary,
+                          ),
+                          SizedBox(width: 16),
+                          Text(
+                            'Ajouter nouveau GIE',
+                            style: TextStyle(
+                              color: AppColors.textPrimary,
+                              fontWeight: FontWeight.w500,
+                              fontSize: 15,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+                onChanged: (selected) {
+                  if (selected == null) {
+                    _showAddGieDialog();
+                  } else {
+                    setState(() {
+                      selectedGie = selected;
+                    });
+                  }
+                },
+              ),
+            ),
+            const SizedBox(height: 16),
             TextField(
               controller: seatsController,
               keyboardType: TextInputType.number,
@@ -979,6 +1113,10 @@ class _AddBusSheetState extends State<_AddBusSheet> {
                     );
                     return;
                   }
+                  if (selectedGie == null) {
+                    Get.snackbar('Erreur', 'Veuillez sélectionner un GIE');
+                    return;
+                  }
                   final sections = <Map<String, dynamic>>[];
                   for (int i = 0; i < numberOfSections; i++) {
                     sections.add({
@@ -992,6 +1130,7 @@ class _AddBusSheetState extends State<_AddBusSheet> {
                     'plateNumber': plateNumberController.text,
                     'line': lineController.text,
                     'driver': selectedDriver!.name,
+                    'gie': selectedGie,
                     'status': 'En service',
                     'seats': int.tryParse(seatsController.text) ?? 45,
                     'sections': sections,
@@ -1135,9 +1274,14 @@ class _EditBusSheetState extends State<_EditBusSheet> {
   final DriverController driverController = Get.put(DriverController());
   Driver? selectedDriver;
 
+  // GIE management
+  late AuthController authController;
+  String? selectedGie;
+
   @override
   void initState() {
     super.initState();
+    authController = Get.find<AuthController>();
     currentStatus = widget.bus['status'] ?? 'En service';
     sections = List<Map<String, dynamic>>.from(widget.bus['sections'] ?? []);
     plateNumberController = TextEditingController(
@@ -1159,6 +1303,9 @@ class _EditBusSheetState extends State<_EditBusSheet> {
       );
     }
 
+    // Initialize selected GIE from bus data
+    selectedGie = widget.bus['gie'] as String?;
+
     for (var section in sections) {
       sectionPriceControllers.add(
         TextEditingController(text: section['price'].toString()),
@@ -1177,6 +1324,67 @@ class _EditBusSheetState extends State<_EditBusSheet> {
       controller.dispose();
     }
     super.dispose();
+  }
+
+  List<String> _getUserGies() {
+    return authController.currentUser.value?.gieCompanies ?? [];
+  }
+
+  void _showAddGieDialog() {
+    final nameController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: Colors.white,
+        title: const Text(
+          'Ajouter un GIE',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Colors.black,
+            fontSize: 16,
+          ),
+        ),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: nameController,
+                decoration: const InputDecoration(
+                  labelText: 'Nom du GIE',
+                  hintText: 'Ex: GIE Dakar Transport',
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(
+                      color: AppColors.primary,
+                      width: 1.0,
+                      style: BorderStyle.solid,
+                    ),
+                    borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(onPressed: () => Get.back(), child: const Text('Annuler')),
+          ElevatedButton(
+            onPressed: () {
+              if (nameController.text.isNotEmpty) {
+                setState(() {
+                  selectedGie = nameController.text;
+                });
+                Get.back();
+                Get.snackbar('Succès', 'GIE ajouté');
+              }
+            },
+            style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary),
+            child: const Text('Ajouter'),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -1339,6 +1547,71 @@ class _EditBusSheetState extends State<_EditBusSheet> {
                     }
                   },
                 ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            // GIE Dropdown - Edit Bus Sheet
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+              decoration: BoxDecoration(
+                color: Colors.grey[50],
+                border: Border.all(color: Colors.grey[300]!),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: DropdownButton<String>(
+                isExpanded: true,
+                dropdownColor: AppColors.white,
+                underline: Container(),
+                value: selectedGie,
+                hint: const Text('Sélectionner un GIE'),
+                items: [
+                  ...(() {
+                    final userGies = _getUserGies();
+                    final allGies =
+                        selectedGie != null && !userGies.contains(selectedGie)
+                        ? [...userGies, selectedGie!]
+                        : userGies;
+                    return allGies.map((gie) {
+                      return DropdownMenuItem(value: gie, child: Text(gie));
+                    });
+                  })(),
+                  DropdownMenuItem(
+                    value: null,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(vertical: 8),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: AppColors.white),
+                      ),
+                      child: const Row(
+                        children: [
+                          Icon(
+                            Icons.business,
+                            size: 18,
+                            color: AppColors.primary,
+                          ),
+                          SizedBox(width: 16),
+                          Text(
+                            'Ajouter nouveau GIE',
+                            style: TextStyle(
+                              color: AppColors.textPrimary,
+                              fontWeight: FontWeight.w500,
+                              fontSize: 15,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+                onChanged: (selected) {
+                  if (selected == null) {
+                    _showAddGieDialog();
+                  } else {
+                    setState(() {
+                      selectedGie = selected;
+                    });
+                  }
+                },
               ),
             ),
             const SizedBox(height: 16),
@@ -1538,6 +1811,10 @@ class _EditBusSheetState extends State<_EditBusSheet> {
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: () {
+                  if (selectedGie == null) {
+                    Get.snackbar('Erreur', 'Veuillez sélectionner un GIE');
+                    return;
+                  }
                   for (int i = 0; i < sections.length; i++) {
                     sections[i]['price'] =
                         int.tryParse(sectionPriceControllers[i].text) ?? 0;
@@ -1547,6 +1824,7 @@ class _EditBusSheetState extends State<_EditBusSheet> {
                     'plateNumber': plateNumberController.text,
                     'line': lineController.text,
                     'driver': selectedDriver?.name ?? widget.bus['driver'],
+                    'gie': selectedGie,
                     'seats': int.tryParse(seatsController.text) ?? 45,
                     'status': currentStatus,
                     'sections': sections,

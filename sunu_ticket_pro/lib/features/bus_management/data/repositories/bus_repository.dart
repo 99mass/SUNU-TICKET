@@ -1,5 +1,8 @@
 import 'dart:convert';
+import 'dart:math';
 import 'package:flutter/services.dart';
+import 'package:get/get.dart';
+import '../../../auth/presentation/controllers/auth_controller.dart';
 import '../models/bus_model.dart';
 
 class BusRepository {
@@ -29,6 +32,7 @@ class BusRepository {
             "plateNumber": "DK-001-AA",
             "line": "Ligne 5",
             "driver": "Moussa Diop",
+            "gie": "GIE Dakar Transport",
             "status": "En service",
             "seats": 45,
             "departureDate": todayStr,
@@ -44,6 +48,7 @@ class BusRepository {
             "plateNumber": "DK-204-BB",
             "line": "Ligne 12",
             "driver": "Alioune Fall",
+            "gie": "GIE Senegal Bus",
             "status": "En service",
             "seats": 50,
             "departureDate": todayStr,
@@ -58,6 +63,7 @@ class BusRepository {
             "plateNumber": "DK-890-CC",
             "line": "Ligne 3",
             "driver": "Cheikh Ndiaye",
+            "gie": "GIE Dakar Transport",
             "status": "Garage",
             "seats": 45,
             "departureDate": todayStr,
@@ -74,6 +80,7 @@ class BusRepository {
             "plateNumber": "DK-456-DD",
             "line": "Ligne 7",
             "driver": "Amadou Sow",
+            "gie": "GIE Transport Express",
             "status": "En service",
             "seats": 48,
             "departureDate": tomorrowStr,
@@ -94,9 +101,25 @@ class BusRepository {
       final data = await _loadMockData();
       final List<dynamic> busesData = data['buses'] ?? [];
 
-      return busesData
-          .map((bus) => Bus.fromJson(bus as Map<String, dynamic>))
-          .toList();
+      // Récupérer l'utilisateur connecté
+      final authController = Get.find<AuthController>();
+      final userGies = authController.currentUser.value?.gieCompanies ?? [];
+
+      // Si l'utilisateur n'a pas de GIE, retourner une liste vide
+      if (userGies.isEmpty) {
+        return [];
+      }
+
+      // Assigner aléatoirement un GIE de l'utilisateur à chaque bus
+      final random = Random();
+      final modifiedBusesData = busesData.map((bus) {
+        final Map<String, dynamic> busMap = Map.from(bus);
+        final randomGie = userGies[random.nextInt(userGies.length)];
+        busMap['gie'] = randomGie;
+        return busMap;
+      }).toList();
+
+      return modifiedBusesData.map((bus) => Bus.fromJson(bus)).toList();
     } catch (e) {
       throw Exception('Erreur lors du chargement des bus: $e');
     }

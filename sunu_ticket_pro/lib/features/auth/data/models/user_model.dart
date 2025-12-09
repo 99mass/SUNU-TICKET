@@ -5,7 +5,7 @@ class UserModel {
   final String password;
   final String createdAt;
   final bool isVerified;
-  final String? gieCompany;
+  final List<String>? gieCompanies;
 
   UserModel({
     required this.id,
@@ -14,7 +14,7 @@ class UserModel {
     required this.password,
     required this.createdAt,
     required this.isVerified,
-    this.gieCompany,
+    this.gieCompanies,
   });
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
@@ -25,7 +25,9 @@ class UserModel {
       password: json['password'] ?? '',
       createdAt: json['created_at'] ?? '',
       isVerified: json['is_verified'] ?? false,
-      gieCompany: json['gie_company'],
+      gieCompanies: json['gie_companies'] != null
+          ? List<String>.from(json['gie_companies'])
+          : null,
     );
   }
 
@@ -37,7 +39,7 @@ class UserModel {
       'password': password,
       'created_at': createdAt,
       'is_verified': isVerified,
-      'gie_company': gieCompany,
+      'gie_companies': gieCompanies,
     };
   }
 }

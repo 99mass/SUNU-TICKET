@@ -48,7 +48,9 @@ class ProfileScreen extends StatelessWidget {
                     icon: Icons.business_outlined,
                     label: "GIE/Entreprise",
                     value:
-                        authController.currentUser.value?.gieCompany ??
+                        authController.currentUser.value?.gieCompanies?.join(
+                          ', ',
+                        ) ??
                         "Non renseigné",
                   ),
                 ),
