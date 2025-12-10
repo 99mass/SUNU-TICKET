@@ -181,7 +181,7 @@ class DashboardScreen extends StatelessWidget {
               "Recettes",
               "${dashboardController.dailyRevenue.value} F",
               Icons.monetization_on,
-              AppColors.textSecondary,
+              AppColors.primary,
             ),
           ),
         ),
@@ -189,10 +189,10 @@ class DashboardScreen extends StatelessWidget {
         Expanded(
           child: Obx(
             () => _buildStatCard(
-              "Passagers",
+              "Ticket Vendus",
               "${dashboardController.totalPassengers.value}",
-              Icons.people_alt,
-              AppColors.textSecondary,
+              Icons.confirmation_number,
+              AppColors.primary,
             ),
           ),
         ),
@@ -212,31 +212,35 @@ class DashboardScreen extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(8),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.end,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.start,
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: color.withAlpha((0.1 * 255).toInt()),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(icon, color: color, size: 28),
+          ),
+
+          Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: color.withAlpha((0.1 * 255).toInt()),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Icon(icon, color: color),
-              ),
-              const SizedBox(width: 8),
               Text(
                 title,
-                style: TextStyle(color: Colors.grey[600], fontSize: 14),
+                style: TextStyle(color: Colors.grey[600], fontSize: 12),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                value,
+                style: const TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ],
-          ),
-          const SizedBox(height: 6),
-          Text(
-            value,
-            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
           ),
         ],
       ),
@@ -347,7 +351,6 @@ class DashboardScreen extends StatelessWidget {
               const SizedBox(height: 16),
               ElevatedButton.icon(
                 onPressed: () {
-                  // TODO: Navigate to create bus
                   Get.to(() => BusManagementScreen());
                 },
                 icon: const Icon(Icons.add),
@@ -488,7 +491,7 @@ class DashboardScreen extends StatelessWidget {
                       Icon(Icons.person, size: 14, color: Colors.grey[600]),
                       const SizedBox(width: 4),
                       Text(
-                        "Chauffeur: ${bus['receiver']}",
+                        "Receveur: ${bus['receiver'] ?? 'Non assigné'}",
                         style: TextStyle(fontSize: 12, color: Colors.grey[600]),
                       ),
                     ],
@@ -505,7 +508,8 @@ class DashboardScreen extends StatelessWidget {
   Widget _buildBottomNavigationBar(BuildContext context) {
     return Obx(() {
       return Container(
-        height: 80,
+        height: 55 + MediaQuery.of(context).padding.bottom,
+        padding: EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom),
         decoration: BoxDecoration(
           color: AppColors.white,
           boxShadow: [

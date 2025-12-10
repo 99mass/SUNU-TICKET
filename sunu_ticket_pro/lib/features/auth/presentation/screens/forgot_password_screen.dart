@@ -132,17 +132,20 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   child: Column(
                     children: [
                       Container(
-                        width: 80,
-                        height: 80,
+                        width: 100,
+                        height: 100,
                         padding: const EdgeInsets.all(10.0),
                         decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(12),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.1),
-                              blurRadius: 20,
-                              offset: const Offset(0, 10),
+                              color: const Color.fromARGB(
+                                255,
+                                235,
+                                246,
+                                33,
+                              ).withValues(alpha: 0.2),
+                              blurRadius: 30,
+                              offset: const Offset(0, 0),
                             ),
                           ],
                         ),

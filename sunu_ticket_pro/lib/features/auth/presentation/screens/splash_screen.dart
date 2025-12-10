@@ -113,17 +113,20 @@ class _SplashScreenState extends State<SplashScreen>
                       width: size.width * 0.4, // Responsive width
                       height: size.width * 0.4,
                       constraints: const BoxConstraints(
-                        maxWidth: 180,
-                        maxHeight: 180,
+                        maxWidth: 200,
+                        maxHeight: 200,
                       ),
                       decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(30),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.2),
+                            color: const Color.fromARGB(
+                              255,
+                              235,
+                              246,
+                              33,
+                            ).withValues(alpha: 0.2),
                             blurRadius: 30,
-                            offset: const Offset(0, 15),
+                            offset: const Offset(0, 0),
                           ),
                         ],
                       ),
@@ -135,7 +138,7 @@ class _SplashScreenState extends State<SplashScreen>
                     ),
                   ),
                 ),
-                const SizedBox(height: 40),
+                const SizedBox(height: 20),
 
                 // Texte Animé
                 FadeTransition(
@@ -157,7 +160,7 @@ class _SplashScreenState extends State<SplashScreen>
                       Text(
                         'PRO',
                         style: TextStyle(
-                          color: AppColors.secondary,
+                          color: Color.fromARGB(255, 235, 246, 33),
                           fontSize: 24,
                           fontWeight: FontWeight.w900,
                           letterSpacing: 4,
