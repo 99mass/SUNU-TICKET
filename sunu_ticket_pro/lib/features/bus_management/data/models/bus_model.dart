@@ -21,18 +21,20 @@ class Bus {
   final String plateNumber;
   final String line;
   final String driver;
+  final String? receiver;
   final String status;
   final int seats;
   final List<BusSection> sections;
-  final String? gie; // GIE to which the bus belongs
-  final String? departureDate; // Format: YYYY-MM-DD
-  final String? departureTime; // Format: HH:mm
+  final String? gie;
+  final String? departureDate;
+  final String? departureTime;
 
   Bus({
     required this.id,
     required this.plateNumber,
     required this.line,
     required this.driver,
+    this.receiver,
     required this.status,
     required this.seats,
     required this.sections,
@@ -47,6 +49,7 @@ class Bus {
       plateNumber: json['plateNumber'] as String? ?? '',
       line: json['line'] as String? ?? '',
       driver: json['driver'] as String? ?? '',
+      receiver: json['receiver'] as String?,
       status: json['status'] as String? ?? 'En service',
       seats: json['seats'] as int? ?? 45,
       sections:
@@ -66,6 +69,7 @@ class Bus {
       'plateNumber': plateNumber,
       'line': line,
       'driver': driver,
+      'receiver': receiver,
       'status': status,
       'seats': seats,
       'sections': sections.map((e) => e.toJson()).toList(),

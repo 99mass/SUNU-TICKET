@@ -39,9 +39,23 @@ class _PersonnelManagementScreenState extends State<PersonnelManagementScreen>
     return Scaffold(
       backgroundColor: const Color(0xFFF5F7FA),
       appBar: AppBar(
-        title: const Text('Gestion du Personnel'),
-        backgroundColor: AppColors.primary,
+        title: Row(
+          children: [
+            const Icon(Icons.people_alt, size: 26),
+            const SizedBox(width: 8),
+            const Text('Personnel', style: TextStyle(fontSize: 20)),
+          ],
+        ),
         foregroundColor: Colors.white,
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [AppColors.gradientStart, Color(0xFF06407A)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+        ),
         elevation: 0,
         actions: _buildAppBarActions(),
         bottom: TabBar(
@@ -57,7 +71,7 @@ class _PersonnelManagementScreenState extends State<PersonnelManagementScreen>
           },
           tabs: const [
             Tab(text: 'Chauffeurs', icon: Icon(Icons.directions_car)),
-            Tab(text: 'Receveurs', icon: Icon(Icons.people)),
+            Tab(text: 'Receveurs', icon: Icon(Icons.people_alt)),
           ],
         ),
       ),
@@ -157,11 +171,6 @@ class _PersonnelManagementScreenState extends State<PersonnelManagementScreen>
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            _buildStatsBar(
-              total: driverController.activeDrivers.length,
-              label1: 'Total',
-            ),
-            const SizedBox(height: 20),
             ListView.builder(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
@@ -191,11 +200,6 @@ class _PersonnelManagementScreenState extends State<PersonnelManagementScreen>
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            _buildStatsBar(
-              total: receiverController.activeReceivers.length,
-              label1: 'Total',
-            ),
-            const SizedBox(height: 20),
             ListView.builder(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
@@ -234,43 +238,6 @@ class _PersonnelManagementScreenState extends State<PersonnelManagementScreen>
           ),
         ],
       ),
-    );
-  }
-
-  Widget _buildStatsBar({required int total, required String label1}) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withAlpha((0.05 * 255).toInt()),
-            blurRadius: 10,
-          ),
-        ],
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [_buildStatItem(label1, total.toString())],
-      ),
-    );
-  }
-
-  Widget _buildStatItem(String label, String value) {
-    return Column(
-      children: [
-        Text(
-          value,
-          style: const TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-            color: AppColors.primary,
-          ),
-        ),
-        const SizedBox(height: 4),
-        Text(label, style: TextStyle(fontSize: 12, color: Colors.grey[600])),
-      ],
     );
   }
 
@@ -381,24 +348,6 @@ class _PersonnelManagementScreenState extends State<PersonnelManagementScreen>
                     ],
                   ),
                 ),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 6,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.green.withAlpha((0.2 * 255).toInt()),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Text(
-                    driver.status,
-                    style: const TextStyle(
-                      fontSize: 12,
-                      color: Colors.green,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ),
               ],
             ),
           ],
@@ -465,7 +414,7 @@ class _PersonnelManagementScreenState extends State<PersonnelManagementScreen>
                       Row(
                         children: [
                           const Icon(
-                            Icons.people,
+                            Icons.person,
                             size: 18,
                             color: AppColors.primary,
                           ),
@@ -494,24 +443,6 @@ class _PersonnelManagementScreenState extends State<PersonnelManagementScreen>
                         ],
                       ),
                     ],
-                  ),
-                ),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 6,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.green.withAlpha((0.2 * 255).toInt()),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Text(
-                    receiver.status,
-                    style: const TextStyle(
-                      fontSize: 12,
-                      color: Colors.green,
-                      fontWeight: FontWeight.w500,
-                    ),
                   ),
                 ),
               ],

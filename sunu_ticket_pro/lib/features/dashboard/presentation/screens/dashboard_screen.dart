@@ -39,35 +39,26 @@ class DashboardScreen extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Expanded(
-                              flex: 3,
                               child: Text(
-                                "Bus en activité Aujourd'hui",
+                                "Bus en service Aujourd'hui",
                                 style: TextStyle(
-                                  fontSize: 18,
+                                  fontSize: 16,
                                   fontWeight: FontWeight.bold,
-                                  color: Colors.grey[800],
+                                  color: AppColors.textSecondary,
                                 ),
-                              ),
-                            ),
-                            Expanded(
-                              child: TextButton(
-                                onPressed: () {
-                                  // TODO: Navigate to full bus list
-                                },
-                                child: const Text("Voir tout"),
                               ),
                             ),
                           ],
                         ),
-                        const SizedBox(height: 10),
+                        const SizedBox(height: 12),
                         _buildMyBusesList(),
-                        const SizedBox(height: 28),
+                        const SizedBox(height: 20),
                         Text(
                           "Activité Récente",
                           style: TextStyle(
-                            fontSize: 18,
+                            fontSize: 16,
                             fontWeight: FontWeight.bold,
-                            color: Colors.grey[800],
+                            color: AppColors.textSecondary,
                           ),
                         ),
                         const SizedBox(height: 10),
@@ -88,36 +79,7 @@ class DashboardScreen extends StatelessWidget {
             return Container();
         }
       }),
-      bottomNavigationBar: Obx(
-        () => BottomNavigationBar(
-          selectedItemColor: AppColors.primary,
-          unselectedItemColor: Colors.grey,
-          showUnselectedLabels: true,
-          type: BottomNavigationBarType.fixed,
-          currentIndex: dashboardController.currentTabIndex.value,
-          onTap: (index) {
-            dashboardController.currentTabIndex.value = index;
-          },
-          items: const [
-            BottomNavigationBarItem(
-              icon: Icon(Icons.dashboard),
-              label: 'Accueil',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.directions_bus),
-              label: 'Bus',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.analytics),
-              label: 'Rapport',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.people),
-              label: 'Personnel',
-            ),
-          ],
-        ),
-      ),
+      bottomNavigationBar: _buildBottomNavigationBar(context),
     );
   }
 
@@ -131,39 +93,16 @@ class DashboardScreen extends StatelessWidget {
       ),
       decoration: const BoxDecoration(
         gradient: LinearGradient(
-          colors: [AppColors.primary, Color(0xFF06407A)],
+          colors: [AppColors.gradientStart, Color(0xFF06407A)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        borderRadius: BorderRadius.only(
-          bottomLeft: Radius.circular(30),
-          bottomRight: Radius.circular(30),
-        ),
       ),
-      child: Column(
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    "Bonjour,",
-                    style: TextStyle(color: Colors.white70, fontSize: 16),
-                  ),
-                  Obx(
-                    () => Text(
-                      authController.currentUser.value?.name ?? "Utilisateur",
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
               GestureDetector(
                 onTap: () => Get.to(() => ProfileScreen()),
                 child: Container(
@@ -173,15 +112,60 @@ class DashboardScreen extends StatelessWidget {
                     shape: BoxShape.circle,
                   ),
                   child: CircleAvatar(
-                    radius: 20,
-                    backgroundColor: AppColors.primary.withAlpha(
-                      (0.1 * 255).toInt(),
-                    ),
-                    child: const Icon(Icons.person, color: AppColors.primary),
+                    radius: 26,
+                    backgroundImage:
+                        NetworkImage(
+                              'https://www.pngall.com/wp-content/uploads/15/User-PNG-Images-HD.png',
+                            )
+                            as ImageProvider,
                   ),
                 ),
               ),
+              const SizedBox(width: 12),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Text(
+                        "Bonjour",
+                        style: TextStyle(color: Colors.white70, fontSize: 16),
+                      ),
+                      const SizedBox(width: 4),
+                      Text("👋", style: TextStyle(fontSize: 20)),
+                    ],
+                  ),
+                  Obx(
+                    () => Text(
+                      authController.currentUser.value?.name ?? "Utilisateur",
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ],
+          ),
+          GestureDetector(
+            onTap: () {},
+            child: Stack(
+              children: const [
+                Icon(Icons.notifications, color: Colors.white, size: 30),
+                Positioned(
+                  right: 0,
+                  top: 0,
+                  child: CircleAvatar(
+                    radius: 8,
+                    backgroundColor: Colors.red,
+                    foregroundColor: Colors.white,
+                    child: Text("5", style: TextStyle(fontSize: 10)),
+                  ),
+                ),
+              ],
+            ),
           ),
         ],
       ),
@@ -197,7 +181,7 @@ class DashboardScreen extends StatelessWidget {
               "Recettes",
               "${dashboardController.dailyRevenue.value} F",
               Icons.monetization_on,
-              Colors.green,
+              AppColors.textSecondary,
             ),
           ),
         ),
@@ -207,8 +191,8 @@ class DashboardScreen extends StatelessWidget {
             () => _buildStatCard(
               "Passagers",
               "${dashboardController.totalPassengers.value}",
-              Icons.people,
-              Colors.orange,
+              Icons.people_alt,
+              AppColors.textSecondary,
             ),
           ),
         ),
@@ -226,14 +210,7 @@ class DashboardScreen extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withAlpha((0.05 * 255).toInt()),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
+        borderRadius: BorderRadius.circular(8),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.end,
@@ -256,10 +233,10 @@ class DashboardScreen extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 6),
           Text(
             value,
-            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
           ),
         ],
       ),
@@ -371,6 +348,7 @@ class DashboardScreen extends StatelessWidget {
               ElevatedButton.icon(
                 onPressed: () {
                   // TODO: Navigate to create bus
+                  Get.to(() => BusManagementScreen());
                 },
                 icon: const Icon(Icons.add),
                 label: const Text("Ajouter un bus"),
@@ -399,81 +377,198 @@ class DashboardScreen extends StatelessWidget {
         itemCount: dashboardController.myBuses.length,
         itemBuilder: (context, index) {
           final bus = dashboardController.myBuses[index];
-          return Container(
-            margin: const EdgeInsets.only(bottom: 12),
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(12),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withAlpha((0.05 * 255).toInt()),
-                  blurRadius: 5,
-                  offset: const Offset(0, 2),
-                ),
-              ],
-            ),
-            child: Row(
-              children: [
-                Container(
-                  width: 50,
-                  height: 50,
-                  decoration: BoxDecoration(
-                    color: AppColors.primary.withAlpha((0.1 * 255).toInt()),
-                    borderRadius: BorderRadius.circular(10),
+          final statusColor = bus['status'] == 'En service'
+              ? Colors.green
+              : AppColors.textSecondary;
+
+          return InkWell(
+            onTap: () {},
+            child: Container(
+              margin: const EdgeInsets.only(bottom: 12),
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(10),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withAlpha((0.05 * 255).toInt()),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
                   ),
-                  child: const Icon(
-                    Icons.directions_bus,
-                    color: AppColors.primary,
-                    size: 28,
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
-                        bus['plateNumber'],
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.all(10),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.primary.withAlpha(
+                                      (0.1 * 255).toInt(),
+                                    ),
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: const Icon(
+                                    Icons.directions_bus,
+                                    size: 18,
+                                    color: AppColors.primary,
+                                  ),
+                                ),
+                                const SizedBox(width: 6),
+                                Text(
+                                  bus['plateNumber'],
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 4),
+                            Row(
+                              children: [
+                                Icon(
+                                  Icons.route,
+                                  size: 14,
+                                  color: Colors.grey[600],
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  'Ligne: ${bus['line']}',
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    color: Colors.grey[600],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
                         ),
                       ),
-                      const SizedBox(height: 4),
-                      Text(
-                        "${bus['line']} • ${bus['driver']}",
-                        style: TextStyle(color: Colors.grey[600], fontSize: 14),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 6,
+                        ),
+                        child: Text(
+                          bus['status'],
+                          style: TextStyle(
+                            color: statusColor,
+                            fontSize: 12,
+                            fontStyle: FontStyle.italic,
+                          ),
+                        ),
                       ),
                     ],
                   ),
-                ),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 6,
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      Icon(Icons.person, size: 14, color: Colors.grey[600]),
+                      const SizedBox(width: 4),
+                      Text(
+                        "Chauffeur: ${bus['driver']}",
+                        style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                      ),
+                    ],
                   ),
-                  decoration: BoxDecoration(
-                    color: bus['status'] == 'En service'
-                        ? Colors.green.withAlpha((0.1 * 255).toInt())
-                        : Colors.orange.withAlpha((0.1 * 255).toInt()),
-                    borderRadius: BorderRadius.circular(20),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      Icon(Icons.person, size: 14, color: Colors.grey[600]),
+                      const SizedBox(width: 4),
+                      Text(
+                        "Chauffeur: ${bus['receiver']}",
+                        style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                      ),
+                    ],
                   ),
-                  child: Text(
-                    bus['status'],
-                    style: TextStyle(
-                      color: bus['status'] == 'En service'
-                          ? Colors.green
-                          : Colors.orange,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 12,
-                    ),
-                  ),
-                ),
-              ],
+                ],
+              ),
             ),
           );
         },
+      );
+    });
+  }
+
+  Widget _buildBottomNavigationBar(BuildContext context) {
+    return Obx(() {
+      return Container(
+        height: 80,
+        decoration: BoxDecoration(
+          color: AppColors.white,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withAlpha((0.1 * 255).toInt()),
+              blurRadius: 4,
+              offset: const Offset(0, -2),
+            ),
+          ],
+        ),
+        child: Row(
+          children: List.generate(4, (index) {
+            final isSelected =
+                dashboardController.currentTabIndex.value == index;
+            final icons = [
+              Icons.dashboard,
+              Icons.directions_bus,
+              Icons.analytics,
+              Icons.people,
+            ];
+            final labels = ['Accueil', 'Bus', 'Rapport', 'Personnel'];
+
+            return Expanded(
+              child: GestureDetector(
+                onTap: () {
+                  dashboardController.currentTabIndex.value = index;
+                },
+                child: Stack(
+                  alignment: Alignment.topCenter,
+                  children: [
+                    if (isSelected)
+                      Container(height: 2, color: AppColors.primary),
+                    Container(
+                      height: 78,
+                      alignment: Alignment.center,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            icons[index],
+                            color: isSelected
+                                ? AppColors.primary
+                                : AppColors.textSecondary,
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            labels[index],
+                            style: TextStyle(
+                              color: isSelected
+                                  ? AppColors.primary
+                                  : AppColors.textSecondary,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }),
+        ),
       );
     });
   }

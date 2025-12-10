@@ -83,9 +83,12 @@ class DashboardController extends GetxController {
       final todayString =
           '${today.year}-${today.month.toString().padLeft(2, '0')}-${today.day.toString().padLeft(2, '0')}';
 
-      // Filtrer les bus avec date de départ = aujourd'hui
+      // Filtrer les bus avec date de départ = aujourd'hui et statut "En service"
       final busesToday = buses
-          .where((bus) => bus.departureDate == todayString)
+          .where(
+            (bus) =>
+                bus.departureDate == todayString && bus.status == 'En service',
+          )
           .map((bus) => bus.toMap())
           .toList();
 

@@ -26,10 +26,26 @@ class _BusManagementScreenState extends State<BusManagementScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F7FA),
       appBar: AppBar(
-        title: const Text("Gestion des Bus"),
-        backgroundColor: AppColors.primary,
+        title: Row(
+          children: [
+            const Icon(Icons.directions_bus, size: 26),
+            const SizedBox(width: 8),
+            Text("Mes Bus", style: TextStyle(fontSize: 20)),
+          ],
+        ),
+        backgroundColor: Colors.transparent,
         foregroundColor: Colors.white,
         elevation: 0,
+        centerTitle: false,
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [AppColors.gradientStart, Color(0xFF06407A)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+        ),
         actions: selectedBuses.isNotEmpty
             ? [
                 IconButton(
@@ -166,7 +182,7 @@ class _BusManagementScreenState extends State<BusManagementScreen> {
   Widget _buildBusCard(Map<String, dynamic> bus, BuildContext context) {
     final statusColor = bus['status'] == 'En service'
         ? Colors.green
-        : Colors.orange;
+        : AppColors.textSecondary;
     final isSelected = selectedBuses.contains(bus['id']);
 
     return GestureDetector(
@@ -217,6 +233,7 @@ class _BusManagementScreenState extends State<BusManagementScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Expanded(
@@ -262,31 +279,40 @@ class _BusManagementScreenState extends State<BusManagementScreen> {
                     horizontal: 12,
                     vertical: 6,
                   ),
-                  decoration: BoxDecoration(
-                    color: statusColor.withAlpha((0.1 * 255).toInt()),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
                   child: Text(
                     bus['status'],
                     style: TextStyle(
                       color: statusColor,
-                      fontWeight: FontWeight.bold,
                       fontSize: 12,
+                      fontStyle: FontStyle.italic,
                     ),
                   ),
                 ),
               ],
             ),
             const SizedBox(height: 12),
+
+            Row(
+              children: [
+                Icon(Icons.person, size: 14, color: Colors.grey[600]),
+                const SizedBox(width: 4),
+                Text(
+                  "Chauffeur: ${bus['driver']}",
+                  style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                ),
+              ],
+            ),
+
+            const SizedBox(height: 8),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Row(
                   children: [
-                    Icon(Icons.person, size: 14, color: Colors.grey[600]),
+                    Icon(Icons.category, size: 14, color: Colors.grey[600]),
                     const SizedBox(width: 4),
                     Text(
-                      "Chauffeur: ${bus['driver']}",
+                      "${(bus['sections'] as List?)?.length ?? 0} sections",
                       style: TextStyle(fontSize: 12, color: Colors.grey[600]),
                     ),
                   ],
@@ -295,20 +321,8 @@ class _BusManagementScreenState extends State<BusManagementScreen> {
                   "${bus['seats']} places",
                   style: const TextStyle(
                     fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.primary,
+                    color: AppColors.textSecondary,
                   ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            Row(
-              children: [
-                Icon(Icons.category, size: 14, color: Colors.grey[600]),
-                const SizedBox(width: 4),
-                Text(
-                  "${(bus['sections'] as List?)?.length ?? 0} sections",
-                  style: TextStyle(fontSize: 12, color: Colors.grey[600]),
                 ),
               ],
             ),

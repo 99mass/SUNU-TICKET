@@ -41,11 +41,25 @@ class _ReportsScreenState extends State<ReportsScreen>
     return Scaffold(
       backgroundColor: const Color(0xFFF5F7FA),
       appBar: AppBar(
-        title: const Text("Rapports"),
-        backgroundColor: AppColors.primary,
+        title: Row(
+          children: [
+            const Icon(Icons.history, size: 26),
+            const SizedBox(width: 8),
+            const Text("Rapports", style: TextStyle(fontSize: 20)),
+          ],
+        ),
         foregroundColor: Colors.white,
         elevation: 0,
         centerTitle: false,
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [AppColors.gradientStart, Color(0xFF06407A)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+        ),
         bottom: TabBar(
           controller: _tabController,
           indicatorColor: Colors.white,
@@ -195,24 +209,12 @@ class _ReportsScreenState extends State<ReportsScreen>
                             ),
                           ),
                           if (showStatus)
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 8,
-                                vertical: 4,
-                              ),
-                              decoration: BoxDecoration(
-                                color: AppColors.primary.withAlpha(
-                                  (0.1 * 255).toInt(),
-                                ),
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: Text(
-                                report.statusText,
-                                style: TextStyle(
-                                  color: AppColors.textPrimary,
-                                  fontSize: 12,
-                                  fontStyle: FontStyle.italic,
-                                ),
+                            Text(
+                              report.statusText,
+                              style: TextStyle(
+                                color: AppColors.textSecondary,
+                                fontSize: 12,
+                                fontStyle: FontStyle.italic,
                               ),
                             ),
                         ],
@@ -220,7 +222,10 @@ class _ReportsScreenState extends State<ReportsScreen>
                       const SizedBox(height: 4),
                       Text(
                         "${report.busLine} • ${report.driverName}",
-                        style: TextStyle(color: Colors.grey[600], fontSize: 14),
+                        style: TextStyle(
+                          color: AppColors.textSecondary,
+                          fontSize: 14,
+                        ),
                       ),
                     ],
                   ),
@@ -231,15 +236,25 @@ class _ReportsScreenState extends State<ReportsScreen>
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  "${report.totalTicketsSold} tickets",
-                  style: TextStyle(color: Colors.grey[600], fontSize: 14),
+                Row(
+                  children: [
+                    const Icon(
+                      Icons.confirmation_number,
+                      size: 16,
+                      color: AppColors.textSecondary,
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      "${report.totalTicketsSold} tickets",
+                      style: TextStyle(color: Colors.grey[600], fontSize: 14),
+                    ),
+                  ],
                 ),
                 Text(
                   "${report.netProfit.toInt()} F CFA",
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    color: AppColors.textPrimary,
+                    color: AppColors.textSecondary,
                     fontSize: 14,
                   ),
                 ),
