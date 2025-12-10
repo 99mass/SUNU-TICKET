@@ -13,8 +13,10 @@ class ReportRepository {
       final List<dynamic> jsonList = json.decode(jsonString);
       final today = DateTime.now();
 
-      // Modify the JSON data to set dates to today
-      final List<Map<String, dynamic>> modifiedJsonList = jsonList.map((json) {
+      // Take the first 2 reports and set them to today, regardless of their original dates
+      final List<Map<String, dynamic>> todayReports = jsonList.take(2).map((
+        json,
+      ) {
         final Map<String, dynamic> modifiedJson = Map.from(json);
         modifiedJson['date'] = today.toIso8601String();
 
@@ -45,10 +47,24 @@ class ReportRepository {
           modifiedJson['arrivalTime'] = todayArrivalTime.toIso8601String();
         }
 
+        // Update validation time if it exists
+        if (modifiedJson['validatedAt'] != null) {
+          final validatedTime = DateTime.parse(modifiedJson['validatedAt']);
+          final todayValidatedTime = DateTime(
+            today.year,
+            today.month,
+            today.day,
+            validatedTime.hour,
+            validatedTime.minute,
+            validatedTime.second,
+          );
+          modifiedJson['validatedAt'] = todayValidatedTime.toIso8601String();
+        }
+
         return modifiedJson;
       }).toList();
 
-      final List<ReportModel> reports = modifiedJsonList
+      final List<ReportModel> reports = todayReports
           .map((json) => ReportModel.fromJson(json))
           .toList();
 
@@ -69,12 +85,15 @@ class ReportRepository {
       final List<dynamic> jsonList = json.decode(jsonString);
       final now = DateTime.now();
 
-      // Modify the JSON data to create past reports (yesterday and before)
-      final List<Map<String, dynamic>> modifiedJsonList = jsonList.map((json) {
+      // Take reports after the first 2 (which are used for today) and set them to past dates
+      final List<Map<String, dynamic>> pastReports = jsonList.skip(2).map((
+        json,
+      ) {
         final Map<String, dynamic> modifiedJson = Map.from(json);
 
         // For demo purposes, distribute reports to past days
-        final reportIndex = jsonList.indexOf(json);
+        final reportIndex =
+            jsonList.indexOf(json) - 2; // Adjust index since we skipped first 2
         final daysBack = (reportIndex % 7) + 1; // 1 to 7 days back
         final reportDate = now.subtract(Duration(days: daysBack));
 
@@ -107,10 +126,24 @@ class ReportRepository {
           modifiedJson['arrivalTime'] = reportArrivalTime.toIso8601String();
         }
 
+        // Update validation time if it exists
+        if (modifiedJson['validatedAt'] != null) {
+          final validatedTime = DateTime.parse(modifiedJson['validatedAt']);
+          final reportValidatedTime = DateTime(
+            reportDate.year,
+            reportDate.month,
+            reportDate.day,
+            validatedTime.hour,
+            validatedTime.minute,
+            validatedTime.second,
+          );
+          modifiedJson['validatedAt'] = reportValidatedTime.toIso8601String();
+        }
+
         return modifiedJson;
       }).toList();
 
-      final List<ReportModel> reports = modifiedJsonList
+      final List<ReportModel> reports = pastReports
           .map((json) => ReportModel.fromJson(json))
           .toList();
 

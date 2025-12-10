@@ -12,8 +12,29 @@ class ReportsScreen extends StatefulWidget {
   State<ReportsScreen> createState() => _ReportsScreenState();
 }
 
-class _ReportsScreenState extends State<ReportsScreen> {
+class _ReportsScreenState extends State<ReportsScreen>
+    with SingleTickerProviderStateMixin {
   final ReportController reportController = Get.put(ReportController());
+  late TabController _tabController;
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 2, vsync: this);
+    _tabController.addListener(() {
+      if (_tabController.index == 1 && reportController.pastReports.isEmpty) {
+        reportController.loadPastReports();
+      }
+    });
+    // Load past reports immediately
+    reportController.loadPastReports();
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -24,96 +45,111 @@ class _ReportsScreenState extends State<ReportsScreen> {
         backgroundColor: AppColors.primary,
         foregroundColor: Colors.white,
         elevation: 0,
+        centerTitle: false,
+        bottom: TabBar(
+          controller: _tabController,
+          indicatorColor: Colors.white,
+          labelColor: Colors.white,
+          unselectedLabelColor: Colors.white70,
+          tabs: const [
+            Tab(icon: Icon(Icons.today), text: "Rapports du Jour"),
+            Tab(icon: Icon(Icons.history), text: "Rapports Passés"),
+          ],
+        ),
       ),
-      body: Obx(() {
-        if (reportController.isLoading.value) {
-          return const Center(child: CircularProgressIndicator());
-        }
+      body: TabBarView(
+        controller: _tabController,
+        children: [
+          _buildReportsTab(reportController.reports, "Rapports du Jour"),
+          _buildReportsTab(reportController.pastReports, "Rapports Passés"),
+        ],
+      ),
+    );
+  }
 
-        if (reportController.error.value.isNotEmpty) {
-          return Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Icon(Icons.error_outline, size: 64, color: Colors.red),
-                const SizedBox(height: 16),
-                Text(
-                  reportController.error.value,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(fontSize: 16),
-                ),
-                const SizedBox(height: 16),
-                ElevatedButton(
-                  onPressed: () => reportController.loadReports(),
-                  child: const Text('Réessayer'),
-                ),
-              ],
-            ),
-          );
-        }
+  Widget _buildReportsTab(RxList<ReportModel> reportsList, String title) {
+    return Obx(() {
+      if (reportController.isLoading.value) {
+        return const Center(child: CircularProgressIndicator());
+      }
 
-        if (reportController.reports.isEmpty) {
-          return Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  Icons.analytics_outlined,
-                  size: 64,
-                  color: Colors.grey[400],
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  "Aucun rapport disponible",
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.grey[600],
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  "Les rapports apparaîtront après validation",
-                  style: TextStyle(fontSize: 14, color: Colors.grey[500]),
-                ),
-              ],
-            ),
-          );
-        }
-
-        return SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
+      if (reportController.error.value.isNotEmpty) {
+        return Center(
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // Reports list
+              const Icon(Icons.error_outline, size: 64, color: Colors.red),
+              const SizedBox(height: 16),
               Text(
-                "Rapports du Jour",
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.grey[800],
-                ),
+                reportController.error.value,
+                textAlign: TextAlign.center,
+                style: const TextStyle(fontSize: 16),
               ),
               const SizedBox(height: 16),
-
-              ListView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: reportController.reports.length,
-                itemBuilder: (context, index) {
-                  final report = reportController.reports[index];
-                  return _buildReportCard(report);
+              ElevatedButton(
+                onPressed: () {
+                  if (title == "Rapports du Jour") {
+                    reportController.loadReports();
+                  } else {
+                    reportController.loadPastReports();
+                  }
                 },
+                child: const Text('Réessayer'),
               ),
             ],
           ),
         );
-      }),
-    );
+      }
+
+      if (reportsList.isEmpty) {
+        return Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.analytics_outlined, size: 64, color: Colors.grey[400]),
+              const SizedBox(height: 16),
+              Text(
+                "Aucun rapport disponible",
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.grey[600],
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                title == "Rapports du Jour"
+                    ? "Les rapports apparaîtront après validation"
+                    : "Aucun rapport passé trouvé",
+                style: TextStyle(fontSize: 14, color: Colors.grey[500]),
+              ),
+            ],
+          ),
+        );
+      }
+
+      return SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            ListView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: reportsList.length,
+              itemBuilder: (context, index) {
+                final report = reportsList[index];
+                final showStatus = title == "Rapports du Jour";
+                return _buildReportCard(report, showStatus);
+              },
+            ),
+          ],
+        ),
+      );
+    });
   }
 
-  Widget _buildReportCard(ReportModel report) {
+  Widget _buildReportCard(ReportModel report, [bool showStatus = false]) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
@@ -128,6 +164,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Container(
                   padding: const EdgeInsets.all(8),
@@ -146,38 +183,46 @@ class _ReportsScreenState extends State<ReportsScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        report.busPlateNumber,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                        ),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              report.busPlateNumber,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                              ),
+                            ),
+                          ),
+                          if (showStatus)
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 4,
+                              ),
+                              decoration: BoxDecoration(
+                                color: AppColors.primary.withAlpha(
+                                  (0.1 * 255).toInt(),
+                                ),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Text(
+                                report.statusText,
+                                style: TextStyle(
+                                  color: AppColors.textPrimary,
+                                  fontSize: 12,
+                                  fontStyle: FontStyle.italic,
+                                ),
+                              ),
+                            ),
+                        ],
                       ),
+                      const SizedBox(height: 4),
                       Text(
                         "${report.busLine} • ${report.driverName}",
                         style: TextStyle(color: Colors.grey[600], fontSize: 14),
                       ),
                     ],
-                  ),
-                ),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 4,
-                  ),
-                  decoration: BoxDecoration(
-                    color: report.isValidated
-                        ? Colors.green.withAlpha((0.1 * 255).toInt())
-                        : Colors.orange.withAlpha((0.1 * 255).toInt()),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Text(
-                    report.statusText,
-                    style: TextStyle(
-                      color: report.isValidated ? Colors.green : Colors.orange,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 12,
-                    ),
                   ),
                 ),
               ],
@@ -194,7 +239,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
                   "${report.netProfit.toInt()} F CFA",
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    color: report.netProfit >= 0 ? Colors.green : Colors.red,
+                    color: AppColors.textPrimary,
                     fontSize: 14,
                   ),
                 ),

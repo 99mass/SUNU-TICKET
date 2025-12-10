@@ -6,9 +6,9 @@
     "busLine": "Ligne 4",
     "driverName": "Ousmane Ba",
     "receiverName": "Moussa Diop",
-    "date": "2025-12-07T00:00:00.000Z",
-    "departureTime": "2025-12-07T06:30:00.000Z",
-    "arrivalTime": "2025-12-07T18:00:00.000Z",
+    "date": "2024-12-07T00:00:00.000Z",
+    "departureTime": "2024-12-07T06:30:00.000Z",
+    "arrivalTime": "2024-12-07T18:00:00.000Z",
     "departureLocation": "Colobane",
     "arrivalLocation": "Liberté 6",
     "ticketsBySection": {
@@ -26,7 +26,9 @@
     "receiverBonus": 2000.0,
     "totalExpenses": 22000.0,
     "netProfit": 2700.0,
-    "isValidated": false
+    "isValidated": true,
+    "validatedAt": "2024-12-07T19:00:00.000Z",
+    "validatedBy": "Propriétaire"
   },
   {
     "id": "report_002",
@@ -35,9 +37,9 @@
     "busLine": "Ligne 5",
     "driverName": "Amadou Sow",
     "receiverName": "Fatou Ndiaye",
-    "date": "2025-12-07T00:00:00.000Z",
-    "departureTime": "2025-12-07T07:00:00.000Z",
-    "arrivalTime": "2025-12-07T17:30:00.000Z",
+    "date": "2024-12-06T00:00:00.000Z",
+    "departureTime": "2024-12-06T07:00:00.000Z",
+    "arrivalTime": "2024-12-06T17:30:00.000Z",
     "departureLocation": "Keur Massar",
     "arrivalLocation": "Plateau",
     "ticketsBySection": {
@@ -57,7 +59,7 @@
     "totalExpenses": 32000.0,
     "netProfit": 20800.0,
     "isValidated": true,
-    "validatedAt": "2025-12-07T19:00:00.000Z",
+    "validatedAt": "2024-12-06T19:00:00.000Z",
     "validatedBy": "Propriétaire"
   },
   {
@@ -67,9 +69,9 @@
     "busLine": "Ligne 3",
     "driverName": "Ibrahima Faye",
     "receiverName": "Aminata Diallo",
-    "date": "2025-12-07T00:00:00.000Z",
-    "departureTime": "2025-12-07T06:45:00.000Z",
-    "arrivalTime": "2025-12-07T18:15:00.000Z",
+    "date": "2024-12-05T00:00:00.000Z",
+    "departureTime": "2024-12-05T06:45:00.000Z",
+    "arrivalTime": "2024-12-05T18:15:00.000Z",
     "departureLocation": "Mermoz",
     "arrivalLocation": "Yoff",
     "ticketsBySection": {
@@ -87,6 +89,71 @@
     "receiverBonus": 1800.0,
     "totalExpenses": 19600.0,
     "netProfit": 3000.0,
-    "isValidated": false
+    "isValidated": true,
+    "validatedAt": "2024-12-05T19:00:00.000Z",
+    "validatedBy": "Propriétaire"
+  },
+  {
+    "id": "report_004",
+    "busId": "bus_004",
+    "busPlateNumber": "SN-3344-EF",
+    "busLine": "Ligne 2",
+    "driverName": "Mamadou Diallo",
+    "receiverName": "Seynabou Faye",
+    "date": "2024-12-04T00:00:00.000Z",
+    "departureTime": "2024-12-04T07:15:00.000Z",
+    "arrivalTime": "2024-12-04T17:45:00.000Z",
+    "departureLocation": "Parcelles Assainies",
+    "arrivalLocation": "Centre Ville",
+    "ticketsBySection": {
+      "1": 55,
+      "2": 42,
+      "3": 38,
+      "4": 31
+    },
+    "totalRevenue": 28300.0,
+    "fuelCost": 16000.0,
+    "breakdownCost": 2000.0,
+    "towingCost": 0.0,
+    "policePenaltyCost": 1500.0,
+    "driverBonus": 3200.0,
+    "receiverBonus": 2200.0,
+    "totalExpenses": 24900.0,
+    "netProfit": 3400.0,
+    "isValidated": true,
+    "validatedAt": "2024-12-04T18:30:00.000Z",
+    "validatedBy": "Propriétaire"
+  },
+  {
+    "id": "report_005",
+    "busId": "bus_005",
+    "busPlateNumber": "DK-7890-GH",
+    "busLine": "Ligne 6",
+    "driverName": "Cheikh Ndiaye",
+    "receiverName": "Aïssatou Ba",
+    "date": "2024-12-03T00:00:00.000Z",
+    "departureTime": "2024-12-03T06:00:00.000Z",
+    "arrivalTime": "2024-12-03T18:30:00.000Z",
+    "departureLocation": "Ouakam",
+    "arrivalLocation": "Marché Kermel",
+    "ticketsBySection": {
+      "1": 48,
+      "2": 35,
+      "3": 44,
+      "4": 26,
+      "5": 22
+    },
+    "totalRevenue": 26200.0,
+    "fuelCost": 15500.0,
+    "breakdownCost": 0.0,
+    "towingCost": 2500.0,
+    "policePenaltyCost": 0.0,
+    "driverBonus": 2900.0,
+    "receiverBonus": 1900.0,
+    "totalExpenses": 22800.0,
+    "netProfit": 3400.0,
+    "isValidated": true,
+    "validatedAt": "2024-12-03T19:15:00.000Z",
+    "validatedBy": "Propriétaire"
   }
 ]
