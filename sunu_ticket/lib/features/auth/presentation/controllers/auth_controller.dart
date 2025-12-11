@@ -16,12 +16,6 @@ class AuthController extends GetxController {
   final isAuthenticated = false.obs;
   final phoneNumber = ''.obs;
 
-  // Pour l'écran OTP
-  final otpCode = ''.obs;
-  final otpLoading = false.obs;
-
-  // Pour la réinitialisation du mot de passe
-  final resetStep = 0.obs; // 0: Phone, 1: OTP, 2: New Password
 
   @override
   void onInit() {
@@ -92,177 +86,6 @@ class AuthController extends GetxController {
     }
   }
 
-  /// Inscription d'un nouvel utilisateur
-  Future<void> register({
-    required String name,
-    required String phone,
-    required String password,
-    required String passwordConfirm,
-  }) async {
-    try {
-      isLoading.value = true;
-      errorMessage.value = '';
-      isSuccess.value = false;
-
-      // Validation basique
-      if (name.isEmpty) {
-        errorMessage.value = 'Le nom est requis';
-        isLoading.value = false;
-        return;
-      }
-
-      if (phone.isEmpty) {
-        errorMessage.value = 'Le téléphone est requis';
-        isLoading.value = false;
-        return;
-      }
-
-      if (password.isEmpty) {
-        errorMessage.value = 'Le mot de passe est requis';
-        isLoading.value = false;
-        return;
-      }
-
-      if (password != passwordConfirm) {
-        errorMessage.value = 'Les mots de passe ne correspondent pas';
-        isLoading.value = false;
-        return;
-      }
-
-      if (password.length != 4) {
-        errorMessage.value = 'Le code PIN doit contenir 4 chiffres';
-        isLoading.value = false;
-        return;
-      }
-
-      final response = await _authRepository.register(
-        name: name,
-        phone: phone,
-        password: password,
-      );
-
-      if (response.success) {
-        authToken.value = response.token ?? '';
-        currentUser.value = response.user;
-        phoneNumber.value = phone;
-        isAuthenticated.value = true;
-        isSuccess.value = true;
-        errorMessage.value = '';
-      } else {
-        errorMessage.value = response.message;
-        isSuccess.value = false;
-      }
-    } catch (e) {
-      errorMessage.value = 'Erreur: ${e.toString()}';
-      isSuccess.value = false;
-    } finally {
-      isLoading.value = false;
-    }
-  }
-
-  /// Vérification du code OTP
-  Future<void> verifyOtp({required String phone, required String otp}) async {
-    try {
-      otpLoading.value = true;
-      errorMessage.value = '';
-
-      final response = await _authRepository.verifyOtp(phone: phone, otp: otp);
-
-      if (response.success) {
-        authToken.value = response.token ?? '';
-        currentUser.value = response.user;
-        phoneNumber.value = phone;
-        isAuthenticated.value = true;
-        isSuccess.value = true;
-        errorMessage.value = '';
-      } else {
-        errorMessage.value = response.message;
-        isSuccess.value = false;
-      }
-    } catch (e) {
-      errorMessage.value = 'Erreur: ${e.toString()}';
-      isSuccess.value = false;
-    } finally {
-      otpLoading.value = false;
-    }
-  }
-
-  /// Envoyer OTP pour réinitialisation
-  Future<void> sendResetOtp(String phone) async {
-    try {
-      isLoading.value = true;
-      errorMessage.value = '';
-
-      final response = await _authRepository.sendPasswordResetOtp(phone: phone);
-
-      if (response.success) {
-        phoneNumber.value = phone;
-        resetStep.value = 1; // Passer à l'étape OTP
-      } else {
-        errorMessage.value = response.message;
-      }
-    } catch (e) {
-      errorMessage.value = 'Erreur: $e';
-    } finally {
-      isLoading.value = false;
-    }
-  }
-
-  /// Vérifier OTP pour réinitialisation
-  Future<void> verifyResetOtp(String otp) async {
-    try {
-      isLoading.value = true;
-      errorMessage.value = '';
-
-      // On utilise la même méthode de vérification OTP
-      // Dans un cas réel, on aurait peut-être un endpoint spécifique
-      final response = await _authRepository.verifyOtp(
-        phone: phoneNumber.value,
-        otp: otp,
-      );
-
-      if (response.success) {
-        resetStep.value = 2; // Passer à l'étape Nouveau Mot de passe
-      } else {
-        errorMessage.value = response.message;
-      }
-    } catch (e) {
-      errorMessage.value = 'Erreur: $e';
-    } finally {
-      isLoading.value = false;
-    }
-  }
-
-  /// Réinitialiser le mot de passe final
-  Future<void> resetPassword(String newPassword) async {
-    try {
-      isLoading.value = true;
-      errorMessage.value = '';
-
-      final response = await _authRepository.resetPassword(
-        phone: phoneNumber.value,
-        newPassword: newPassword,
-      );
-
-      if (response.success) {
-        Get.offAllNamed('/login');
-        Get.snackbar(
-          'Succès',
-          'Mot de passe réinitialisé avec succès',
-          backgroundColor: AppColors.success,
-          colorText: Colors.white,
-        );
-        resetStep.value = 0;
-      } else {
-        errorMessage.value = response.message;
-      }
-    } catch (e) {
-      errorMessage.value = 'Erreur: $e';
-    } finally {
-      isLoading.value = false;
-    }
-  }
-
   /// Déconnexion
   void logout() {
     authToken.value = '';
@@ -271,7 +94,6 @@ class AuthController extends GetxController {
     isAuthenticated.value = false;
     errorMessage.value = '';
     isSuccess.value = false;
-    otpCode.value = '';
   }
 
   /// Réinitialiser les erreurs
